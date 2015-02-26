@@ -55,18 +55,12 @@ def pc_coefficient_mtx(h_nl_interp, R_AW_A, r, basis_r, k, basis_k, bplot = Fals
     # ====================================================
     
     
-    if bplot:
-        plt.plot(k_nl, h_nl)
-        plt.plot(k, h_nl_interp)
-        plt.xlim([min(k_nl), max(k_nl) + 5])
-        plt.show()
-    
     interact = np.zeros((4,4))
     for i in xrange(4):
         for j in xrange(i,4):
             integrand_k = basis_k[i,:] * basis_k[j,:] * h_nl_interp * np.power(k,2)
             if bplot:
-                plt.plot(k, integrand)
+                plt.plot(k, integrand_k)
                 plt.show()
             interact_val = np.sum((integrand_k[1:] + integrand_k[:-1]) / 2. * dk)
             print "Interact {}-{} = {}".format(i, j, interact_val)
@@ -96,7 +90,7 @@ def compute_gr(sig_W_A = 2.7, bplot = False):
         basis_r[n,:] = np.power(r - 1, n)
     basis_k[0,:] = (np.sin(k) / np.power(k,3))       - ( np.cos(k) / np.power(k,2))
     basis_k[1,:] = (np.sin(k) / np.power(k,3))       + ( 2. * (np.cos(k) - 1) / np.power(k,4))
-    basis_k[2,:] = (-6. * np.sin(k) / np.power(k,5)) + ( (2. * np.cos(k)) + 4.) / np.power(k,4))
+    basis_k[2,:] = (-6. * np.sin(k) / np.power(k,5)) + (( (2. * np.cos(k)) + 4.) / np.power(k,4))
     basis_k[3,:] = (-6. * np.sin(k) / np.power(k,5)) + ( 24. * (1 - np.cos(k)) / np.power(k,6)) - (6. / np.power(k,4)) 
     basis_k *= 4 * np.pi * R_AW_A**3
     k[0] = 0
@@ -120,8 +114,14 @@ def compute_gr(sig_W_A = 2.7, bplot = False):
 
     # Introduce a factor of R_AW to undimensionalize h_nl
     h_nl_interp = np.interp(k_A, k_nl, h_nl)
+    if bplot:
+        plt.plot(k_nl, h_nl)
+        plt.plot(k, h_nl_interp)
+        plt.xlim([min(k_nl), max(k_nl) + 5])
+        plt.show()
+    
 
-    norm_R, overlap_R, interact_R = pc_coefficient_mtx(h_nl_interp, R_AW_A, r, basis_r, k, basis_k, bplot)
+    norm_R, overlap_R, interact_R = pc_coefficient_mtx(h_nl_interp, R_AW_A, r, basis_r, k, basis_k, bplot = bplot)
 
     print norm_R
     print overlap_R
@@ -129,16 +129,16 @@ def compute_gr(sig_W_A = 2.7, bplot = False):
     
     A = overlap_R + interact_R
     b = norm_R
-    c_AW_i = LA.solve(A,b)
+    c_AW_i = LA.solve(A,-b)
     print c_AW_i
     c_AW_r = np.zeros(N)
     c_AW_k = np.zeros(N)
     for i in xrange(4):
         c_AW_r += basis_r[i,:] * c_AW_i[i]
         c_AW_k += basis_k[i,:] * c_AW_i[i]
-    plt.plot(r_A, c_AW_r)
-    plt.title("C(r)")
-    plt.show()
+    #plt.plot(r_A, c_AW_r)
+    #plt.title("C(r)")
+    #plt.show()
 
     # Reintroduce units
 
@@ -170,6 +170,22 @@ def compute_gr(sig_W_A = 2.7, bplot = False):
     #plt.title("c(k)")
     #plt.show()
 
+##  Code below has arbitrary factors included for "correctness", 
+##  A safety pig is provided for your benefit 
+## _._ _..._ .-',     _.._(`))
+##'-. `     '  /-._.-'    ',/
+##   )         \            '.
+##  / _    _    |             \
+## |  a    a    /              |
+## \   .-.                     ;  
+##  '-('' ).-'       ,'       ;
+##     '-;           |      .'
+##        \           \    /
+##        | 7  .__  _.-\   \
+##        | |  |  ``/  /`  /
+##       /,_|  |   /,_/   /
+##          /,_/      '`-'
+##
     dk_A = np.diff(k_A)
     N_gr = 400
     r_gr = np.linspace(-2, np.log10(R_AW_A + 8), N_gr)
@@ -178,13 +194,8 @@ def compute_gr(sig_W_A = 2.7, bplot = False):
     g_r[r_gr > R_AW_A ] = 0
     g_r2 = np.zeros(N_gr)
     for i, r_i in enumerate(r_gr):
-        integrand_k = h_nl_interp * c_AW_k * k_A * np.sin(k_A * r_i) 
+        integrand_k = h_nl_interp * c_AW_k * k_A * np.sin(k_A * r_i) / np.pi # Include mystery pi???
         g_r2[i] = np.sum((integrand_k[1:] + integrand_k[:-1]) / 2. * dk_A) / (2 * np.pi **2 * r_i)
-    plt.plot(r_gr, g_r + g_r2)
-    #plt.plot(r_gr, g_r)
-    #plt.plot(r_gr, g_r2)
-    plt.title("h(r)")
-    plt.show()
 
     return r_gr, g_r + g_r2 + 1
 
@@ -194,8 +205,18 @@ def main():
     args = parser.parse_args()
     
     r, gr = compute_gr(3.0)
+    plt.plot(r, gr)
+    plt.title("g(r)")
+    plt.show()
     r, gr = compute_gr(4.0)
+    plt.plot(r, gr)
+    plt.title("g(r)")
+    plt.show()
     r, gr = compute_gr(5.0)
+    plt.plot(r, gr)
+    plt.title("g(r)")
+    plt.show()
+    
 
     
     

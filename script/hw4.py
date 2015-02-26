@@ -96,7 +96,7 @@ def compute_gr(sig_W_A = 2.7, bplot = False):
         basis_r[n,:] = np.power(r - 1, n)
     basis_k[0,:] = (np.sin(k) / np.power(k,3))       - ( np.cos(k) / np.power(k,2))
     basis_k[1,:] = (np.sin(k) / np.power(k,3))       + ( 2. * (np.cos(k) - 1) / np.power(k,4))
-    basis_k[2,:] = (-6. * np.sin(k) / np.power(k,5)) + ( (2. * np.cos(k) + 4.) / np.power(k,4))
+    basis_k[2,:] = (-6. * np.sin(k) / np.power(k,5)) + ( (2. * np.cos(k)) + 4.) / np.power(k,4))
     basis_k[3,:] = (-6. * np.sin(k) / np.power(k,5)) + ( 24. * (1 - np.cos(k)) / np.power(k,6)) - (6. / np.power(k,4)) 
     basis_k *= 4 * np.pi * R_AW_A**3
     k[0] = 0

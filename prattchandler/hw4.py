@@ -72,8 +72,8 @@ def pc_coefficient_mtx(h_nl_interp, R_AW_A, r, basis_r, k, basis_k, bplot = Fals
     interact_R = interact / R_AW_A**3  * ( 4. * np.pi / (2 * np.pi)**3)
     return norm_R, overlap_R, interact_R
 
-def compute_gr(sig_W_A = 2.7, bplot = False):
-    sig_A_A = 2.7
+def compute_gr(sig_A_A = 2.7, bplot = False):
+    sig_W_A = 2.7
     R_AW_A  = (sig_A_A + sig_W_A) / 2.
 
     # Set up basis
@@ -139,18 +139,30 @@ def compute_gr(sig_W_A = 2.7, bplot = False):
         c_AW_r += basis_r[i,:] * c_AW_i[i]
         c_AW_k += basis_k[i,:] * c_AW_i[i]
 
+
+    h_AW_k = c_AW_k + (h_nl_interp * c_AW_k)
+
     dk_A = np.diff(k_A)
     N_gr = 400
-    r_gr = np.linspace(-2, np.log10(R_AW_A + 8), N_gr)
+    r_gr = np.linspace(-2, np.log10(R_AW_A + 10), N_gr)
     r_gr = np.power(10, r_gr)
-    g_r = np.interp(r_gr, r_A, c_AW_r)
-    g_r[r_gr > R_AW_A ] = 0
-    g_r2 = np.zeros(N_gr)
+    g_AW_r = np.interp(r_gr, r_A, c_AW_r)
+    g_AW_r[r_gr > R_AW_A ] = 0
+    g_AW_r2 = np.zeros(N_gr)
+    h_AW_r  = np.zeros(N_gr)
     for i, r_i in enumerate(r_gr):
         integrand_k = h_nl_interp * c_AW_k * k_A * np.sin(k_A * r_i)
-        g_r2[i] = np.sum((integrand_k[1:] + integrand_k[:-1]) / 2. * dk_A) / (2 * np.pi **2 * r_i)
+        g_AW_r2[i] = np.sum((integrand_k[1:] + integrand_k[:-1]) / 2. * dk_A) / (2 * np.pi **2 * r_i)
 
-    return r_gr, g_r + g_r2 + 1
+    
+    h_AA_k = .033 * h_AW_k * c_AW_k
+    h_AA_r = np.zeros(N_gr)
+    for i, r_i in enumerate(r_gr):
+        integrand_k = h_AA_k * k_A * np.sin(k_A * r_i)
+        h_AA_r[i] = np.sum((integrand_k[1:] + integrand_k[:-1]) / 2. * dk_A) / (2 * np.pi **2 * r_i)
+    h_AA_r[r_gr < sig_A_A] = 0
+
+    return r_gr, g_AW_r + g_AW_r2 + 1, h_AA_r + 1
 
 def main():
     parser = argparse.ArgumentParser()
@@ -159,21 +171,21 @@ def main():
     
     l = []
     for sig_A in np.linspace(3, 5, 3):
-        r, gr = compute_gr(sig_A)
+        r, g_AW_r, g_AA_r = compute_gr(sig_A)
         R = (sig_A + 2.7) / 2.
-        plt.plot(r - R, gr)
+        plt.plot(r - R, g_AW_r)
         l.append("sig={}".format(sig_A))
     plt.title("g_AW(r) at different radii")
     plt.legend(l)
     plt.show()
-
+    
     N_R = 40
     R_max = 10.0
     sig_A_list = np.linspace(0, (R_max - 2.7), N_R)
     R_list = (sig_A_list + 2.7) / 2.0
     g_AW = np.zeros(N_R)
     for i, sig_i in enumerate(sig_A_list):
-        r, gr = compute_gr(sig_i)
+        r, gr, _ = compute_gr(sig_i)
         subset = (r > R_list[i])
         gr = gr[subset]
         r  = r [subset]
@@ -181,12 +193,27 @@ def main():
         # Use the magnitude of the slope
         g_slope = abs( (gr[1] - gr[0])/(r[1] - r[0]) )
         g_peak = gr[0] +  (r[0] - R_list[i]) * g_slope
-        print "Pre-peak: {}, Post-peak: {}".format(gr[0], g_peak)
         g_AW[i] = g_peak
+    integrand = g_AW * 4 * np.pi * np.square(R_list)
+    factor = .596 * .033
+    delta_mu = np.cumsum((integrand[1:] + integrand[:-1]) / 2. * np.diff(R_list))
+    delta_mu *= factor
+    delta_mu = np.insert(delta_mu, 0, 0.)
+    plt.plot(sig_A_list, delta_mu)
+    plt.title("Solvation free energy for hydrophobe from Pratt-Chandler")
+    plt.ylabel("Delta mu, KCal/mol")
+    plt.xlabel("Solute diameter, Angstrom")
+    plt.show()
 
-    integrand = g_AW * np.square(R_list)
-    delta_mu = np.sum((integrand[1:] + integrand[:-1]) / 2. * np.diff(R_list))
-    print 'Dmu: {}'.format(delta_mu)
+    l = []
+    for sig_A in np.linspace(3, 5, 3):
+        r, g_AW_r, g_AA_r = compute_gr(sig_A)
+        R = (sig_A + 2.7) / 2.
+        plt.plot(r - sig_A, g_AA_r)
+        l.append("sig={}".format(sig_A))
+    plt.title("g_AA(r) at different radii")
+    plt.legend(l)
+    plt.show()
 
         
     

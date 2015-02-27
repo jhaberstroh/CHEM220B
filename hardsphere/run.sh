@@ -6,6 +6,24 @@ if [ -z $1 ]; then
     exit
 fi
 
+if [ ! -e data ]; then
+    mkdir data
+fi
+
+if [ $1 == "TEST-MC" ]; then
+    gcc hardsphere.cc -lstdc++ -o hardsphere-test -DVERBOSE -DXYZOUT -DACCEPTANCE
+    if [ $? == 0 ]; then
+        ./hardsphere-test -nsteq 100 -nstmc 100 -step_size .7
+    fi
+fi
+
+if [ $1 == "TEST-LJ" ]; then
+    gcc lj.cc -lstdc++ -o lj-test -DXYZOUT
+    if [ $? == 0 ]; then
+        ./lj-test -nsteq 10000 -nstmc 100 -dt .1
+    fi
+fi
+
 # =============================================================================
 # HW 1
 # =============================================================================
@@ -37,7 +55,7 @@ fi
 # HW 2
 # =============================================================================
 if [ $1 == "HW2-SIM" ]; then
-    gcc hardsphere.cc -lstdc++ -o hardsphere-fourier -Wall -DFOURIER
+    gcc hardsphere.cc -lstdc++ -o hardsphere-fourier -DFOURIER
     if [ $? = 0 ]; then
       ./hardsphere-fourier -nsteq 500 -nstmc 100000 -step_size .7 -maxfouriernum 100 > data/fourier.csv &
     fi
@@ -51,7 +69,7 @@ fi
 # HW 3
 # =============================================================================
 if [ $1 == "HW3-SIM" ]; then
-    gcc hardsphere.cc -lstdc++ -o hardsphere-gr -Wall -DGR
+    gcc hardsphere.cc -lstdc++ -o hardsphere-gr -DGR
     if [ $? = 0 ]; then
         ./hardsphere-gr -nsteq 500 -nstmc 5000 -step_size  .05 -density  .9 > data/gr_9.csv  &
         ./hardsphere-gr -nsteq 500 -nstmc 5000 -step_size   .1 -density  .8 > data/gr_8.csv  &
@@ -68,4 +86,15 @@ fi
 
 if [ $1 == "HW3-DATA" ]; then
     python script/gr.py data/gr_*.csv
+fi
+
+
+# =============================================================================
+# HW 5
+# =============================================================================
+if [ $1 == "HW5-SIM" ]; then
+    gcc lj.cc -lstdc++ -o lj -DVERBOSE
+    if [ $? = 0 ]; then
+        ./lj
+    fi
 fi

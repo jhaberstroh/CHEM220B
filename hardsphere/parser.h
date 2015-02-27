@@ -1,4 +1,8 @@
+#ifndef __PARSER_H__
+#define __PARSER_H__
 #include <sstream>
+#include <cstdlib>
+#include <string.h>
 
 bool parse_int(int argc, char * argv[], int i, const char * argname, int * arg,
     bool bVerbose = false)
@@ -55,3 +59,4 @@ bool parse_double(int argc, char * argv[], int i, const char * argname, double *
     }
     return false;
 }
+#endif //__PARSER_H__

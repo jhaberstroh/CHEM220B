@@ -26,18 +26,17 @@ def pc_coefficient_mtx(h_nl_interp, R_AW_A, r, basis_r, k, basis_k, bplot = Fals
     # ====================================================
     # Compute overlaps (no units)
     # ====================================================
-    
     norm = np.zeros(4)
     for i in xrange(4):
         integrand_r = basis_r * 4. * np.pi * np.power(r,2)
         norm_val = np.sum((integrand_r[i,1:] + integrand_r[i,:-1]) / 2. * dr )
-        print "Norm {} = {}".format(i, norm_val)
+        if bplot:
+            print "Norm {} = {}".format(i, norm_val)
         norm[i] = norm_val
     
     # ====================================================
     # Compute overlaps (no units)
     # ====================================================
-    
     overlap = np.zeros((4,4))
     for i in xrange(4):
         for j in xrange(i,4):
@@ -46,15 +45,14 @@ def pc_coefficient_mtx(h_nl_interp, R_AW_A, r, basis_r, k, basis_k, bplot = Fals
                 plt.plot(r,overlap_fun_r)
                 plt.show()
             overlap_val = np.sum((overlap_fun_r[1:] + overlap_fun_r[:-1]) / 2. * dr)
-            print "Overlap {}-{} = {}".format(i, j, overlap_val)
+            if bplot:
+                print "Overlap {}-{} = {}".format(i, j, overlap_val)
             overlap[i,j] = overlap_val
             overlap[j,i] = overlap_val
     
     # ====================================================
     # Compute interactions (accounting for units)
     # ====================================================
-    
-    
     interact = np.zeros((4,4))
     for i in xrange(4):
         for j in xrange(i,4):
@@ -63,14 +61,15 @@ def pc_coefficient_mtx(h_nl_interp, R_AW_A, r, basis_r, k, basis_k, bplot = Fals
                 plt.plot(k, integrand_k)
                 plt.show()
             interact_val = np.sum((integrand_k[1:] + integrand_k[:-1]) / 2. * dk)
-            print "Interact {}-{} = {}".format(i, j, interact_val)
+            if bplot:
+                print "Interact {}-{} = {}".format(i, j, interact_val)
             interact[i,j] = interact_val
             interact[j,i] = interact_val
     
-    norm_R     = norm     * R_AW_A**3
-    overlap_R  = overlap  * R_AW_A**3
-    interact_R = interact / R_AW_A**3 * 4. / (2 * np.pi)**3
-
+    # Reintroduce units and include prefactors
+    norm_R     = norm     * R_AW_A**3  
+    overlap_R  = overlap  * R_AW_A**3 
+    interact_R = interact / R_AW_A**3  * ( 4. * np.pi / (2 * np.pi)**3)
     return norm_R, overlap_R, interact_R
 
 def compute_gr(sig_W_A = 2.7, bplot = False):
@@ -87,7 +86,7 @@ def compute_gr(sig_W_A = 2.7, bplot = False):
     r = np.linspace(-7, 0, N)
     r = np.power(10,r)
     for n in xrange(4):
-        basis_r[n,:] = np.power(r - 1, n)
+        basis_r[n,:] = np.power(r - 1, n) 
     basis_k[0,:] = (np.sin(k) / np.power(k,3))       - ( np.cos(k) / np.power(k,2))
     basis_k[1,:] = (np.sin(k) / np.power(k,3))       + ( 2. * (np.cos(k) - 1) / np.power(k,4))
     basis_k[2,:] = (-6. * np.sin(k) / np.power(k,5)) + (( (2. * np.cos(k)) + 4.) / np.power(k,4))
@@ -121,71 +120,25 @@ def compute_gr(sig_W_A = 2.7, bplot = False):
         plt.show()
     
 
-    norm_R, overlap_R, interact_R = pc_coefficient_mtx(h_nl_interp, R_AW_A, r, basis_r, k, basis_k, bplot = bplot)
+    norm_R, overlap_R, interact_R = pc_coefficient_mtx(h_nl_interp, R_AW_A, 
+                                                       r, basis_r, 
+                                                       k, basis_k, 
+                                                       bplot = bplot)
 
-    print norm_R
-    print overlap_R
-    print interact_R
+    if bplot:
+        print norm_R
+        print overlap_R
+        print interact_R
     
     A = overlap_R + interact_R
     b = norm_R
     c_AW_i = LA.solve(A,-b)
-    print c_AW_i
     c_AW_r = np.zeros(N)
     c_AW_k = np.zeros(N)
     for i in xrange(4):
         c_AW_r += basis_r[i,:] * c_AW_i[i]
         c_AW_k += basis_k[i,:] * c_AW_i[i]
-    #plt.plot(r_A, c_AW_r)
-    #plt.title("C(r)")
-    #plt.show()
 
-    # Reintroduce units
-
-    #plt.plot(r, c_AW_r)
-    #plt.title("c_AW(r)")
-    #plt.show()
-    #plt.plot(k, c_AW_k)
-    #plt.title("c_AW(k)")
-    #plt.show()
-
-    #g_r = c_AW_r
-    #plt.plot(r, g_r)
-    #plt.title("c(r) - [0,1] interpolatoin")
-    #plt.show()
-    #g_r2 = np.zeros(N)
-    #for i, r_i in enumerate(r[1:]):
-    #    integrand = h_nl_interp * c_AW_k * k * np.sin(k * r_i)
-    #    g_r2[i+1] = np.sum((integrand[1:] + integrand[:-1]) / 2. * dk) / (2 * np.pi * r_i ** 2)
-    #plt.plot(r, g_r)
-    #plt.plot(r, g_r2)
-    #plt.title("g(r) - [0,1] interpolation")
-    #plt.ylim([-1, 10])
-    #plt.show()
-
-    #plt.plot(r_A, c_AW_r)
-    #plt.title("c(r)")
-    #plt.show()
-    #plt.plot(k_A, c_AW_k)
-    #plt.title("c(k)")
-    #plt.show()
-
-##  Code below has arbitrary factors included for "correctness", 
-##  A safety pig is provided for your benefit 
-## _._ _..._ .-',     _.._(`))
-##'-. `     '  /-._.-'    ',/
-##   )         \            '.
-##  / _    _    |             \
-## |  a    a    /              |
-## \   .-.                     ;  
-##  '-('' ).-'       ,'       ;
-##     '-;           |      .'
-##        \           \    /
-##        | 7  .__  _.-\   \
-##        | |  |  ``/  /`  /
-##       /,_|  |   /,_/   /
-##          /,_/      '`-'
-##
     dk_A = np.diff(k_A)
     N_gr = 400
     r_gr = np.linspace(-2, np.log10(R_AW_A + 8), N_gr)
@@ -194,7 +147,7 @@ def compute_gr(sig_W_A = 2.7, bplot = False):
     g_r[r_gr > R_AW_A ] = 0
     g_r2 = np.zeros(N_gr)
     for i, r_i in enumerate(r_gr):
-        integrand_k = h_nl_interp * c_AW_k * k_A * np.sin(k_A * r_i) / np.pi # Include mystery pi???
+        integrand_k = h_nl_interp * c_AW_k * k_A * np.sin(k_A * r_i)
         g_r2[i] = np.sum((integrand_k[1:] + integrand_k[:-1]) / 2. * dk_A) / (2 * np.pi **2 * r_i)
 
     return r_gr, g_r + g_r2 + 1
@@ -204,18 +157,39 @@ def main():
     parser.add_argument("-plot", action="store_true")
     args = parser.parse_args()
     
-    r, gr = compute_gr(3.0)
-    plt.plot(r, gr)
-    plt.title("g(r)")
+    l = []
+    for sig_A in np.linspace(3, 5, 3):
+        r, gr = compute_gr(sig_A)
+        R = (sig_A + 2.7) / 2.
+        plt.plot(r - R, gr)
+        l.append("sig={}".format(sig_A))
+    plt.title("g_AW(r) at different radii")
+    plt.legend(l)
     plt.show()
-    r, gr = compute_gr(4.0)
-    plt.plot(r, gr)
-    plt.title("g(r)")
-    plt.show()
-    r, gr = compute_gr(5.0)
-    plt.plot(r, gr)
-    plt.title("g(r)")
-    plt.show()
+
+    N_R = 40
+    R_max = 10.0
+    sig_A_list = np.linspace(0, (R_max - 2.7), N_R)
+    R_list = (sig_A_list + 2.7) / 2.0
+    g_AW = np.zeros(N_R)
+    for i, sig_i in enumerate(sig_A_list):
+        r, gr = compute_gr(sig_i)
+        subset = (r > R_list[i])
+        gr = gr[subset]
+        r  = r [subset]
+        r_min = r[0]
+        # Use the magnitude of the slope
+        g_slope = abs( (gr[1] - gr[0])/(r[1] - r[0]) )
+        g_peak = gr[0] +  (r[0] - R_list[i]) * g_slope
+        print "Pre-peak: {}, Post-peak: {}".format(gr[0], g_peak)
+        g_AW[i] = g_peak
+
+    integrand = g_AW * np.square(R_list)
+    delta_mu = np.sum((integrand[1:] + integrand[:-1]) / 2. * np.diff(R_list))
+    print 'Dmu: {}'.format(delta_mu)
+
+        
+    
     
 
     

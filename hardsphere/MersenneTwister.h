@@ -53,6 +53,7 @@
 
 // #include <istd::ostream.h> // RJB: changed this into:
 #include <iostream>
+#include <fstream>
 
 class MTRand {
 // Data

@@ -136,7 +136,7 @@ int main(int argc, char * argv[])
             }
         }
         analyze_particles(particles, N, step, L,
-            nstxyz,                                     //xyz
+            nstxyz, 0,                                  //xyz
             10, probe_rad,                              //probe volume
             10, fouriers, maxfouriernum, nfouriervals,  //fourier coeff
             50);                                        //g_r

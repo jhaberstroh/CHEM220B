@@ -137,15 +137,15 @@ void analyze_particles(double* particles, int N, int step, double L,
             int nstgr)                                  //g_r
 {
 
-#ifdef XYZOUT
+    #ifdef XYZOUT
     if (step % nstxyz == 0)
     {
         printf("%f, %f, %f\n", particles[3 * particle_num], 
                                particles[3 * particle_num + 1], 
                                particles[3 * particle_num + 2]);
     }
-#endif
-#ifdef SMALLSPHERE
+    #endif
+    #ifdef SMALLSPHERE
     if (step % nstprobe == 0)
     {
         double * probe_r = new double[3];
@@ -156,10 +156,8 @@ void analyze_particles(double* particles, int N, int step, double L,
         printf("%d ",occ);
         delete[] probe_r;
     }
-
-#endif
-
-#ifdef LARGESPHERE
+    #endif
+    #ifdef LARGESPHERE
     if (step % nstprobe == 0)
     {
         double * probe_r = new double[3];
@@ -180,9 +178,8 @@ void analyze_particles(double* particles, int N, int step, double L,
         }
         delete[] probe_r;
     }
-#endif
-
-#ifdef FOURIER
+    #endif
+    #ifdef FOURIER
     if ((step % nstfourier == 0) && 
         (step / 10 * 6 < nfouriervals))
     {
@@ -210,9 +207,8 @@ void analyze_particles(double* particles, int N, int step, double L,
             }
         }
     }
-#endif
-
-#ifdef GR
+    #endif
+    #ifdef GR
     if (step % nstgr == 0)
     {
         for (int i = 0 ; i < N ; i++)
@@ -227,7 +223,7 @@ void analyze_particles(double* particles, int N, int step, double L,
             }
         }
     }
-#endif
+    #endif
 }
 
 void postprocess_fourier(double L, double* fouriers, int maxfouriernum, 

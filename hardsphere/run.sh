@@ -1,5 +1,6 @@
 #!/bin/sh 
 # Run with HW#-SIM or -DATA to run code for the corresponding homework assignment
+set -o errexit
 
 if [ -z $1 ]; then
     echo "Requires argument HW#-SIM or HW#-DATA to run"
@@ -29,21 +30,15 @@ fi
 # =============================================================================
 if [ $1 == "HW1-SIM" ]; then
     gcc hardsphere.cc -lstdc++ -o hardsphere-xyz -DXYZOUT
-    if [ $? = 0 ]; then
-      ./hardsphere-xyz -nsteq 400 -step_size .7 > data/atoms.xyz & 
-    fi
+    ./hardsphere-xyz -nsteq 400 -step_size .7 > data/atoms.xyz & 
     
     gcc hardsphere.cc -lstdc++ -o hardsphere-sol -DSMALLSPHERE
-    if [ $? = 0 ]; then
-      ./hardsphere-sol -nsteq 500 -step_size .7 > data/small.csv &
-    fi
+    ./hardsphere-sol -nsteq 500 -step_size .7 > data/small.csv &
     
     gcc hardsphere.cc -lstdc++ -o hardsphere-lg -DLARGESPHERE
-    if [ $? = 0 ]; then
-      ./hardsphere-lg -nsteq 500 -step_size .7 -probe 1.0 > data/large-2.0.csv &
-      ./hardsphere-lg -nsteq 500 -step_size .7 -probe 1.5 > data/large-3.0.csv &
-      ./hardsphere-lg -nsteq 500 -step_size .7 -probe 2.0 > data/large-4.0.csv &
-    fi
+    ./hardsphere-lg -nsteq 500 -step_size .7 -probe 1.0 > data/large-2.0.csv &
+    ./hardsphere-lg -nsteq 500 -step_size .7 -probe 1.5 > data/large-3.0.csv &
+    ./hardsphere-lg -nsteq 500 -step_size .7 -probe 2.0 > data/large-4.0.csv &
 fi
 
 if [ $1 == "HW1-DATA" ]; then

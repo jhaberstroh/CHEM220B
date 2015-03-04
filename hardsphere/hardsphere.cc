@@ -75,19 +75,19 @@ int main(int argc, char * argv[])
     int nfouriervals = nstmc / 10 * 6;
     double* fouriers = new double[maxfouriernum * nfouriervals];
     
-#ifdef VERBOSE
+    #ifdef VERBOSE
     printf("nsteq: %d nstmc: %d\n", nsteq, nstmc);
     printf("L: %f\n", L);
     printf("math.pi: %f\n", M_PI);
-#endif
+    #endif
     
-#ifdef TEST
+    #ifdef TEST
     if (!test_grid_linarr(particles, L, N))
     {
         printf("Linear grid test failed, halting execution\n");
         exit(1);
     }
-#endif
+    #endif
 
     int step;
     int acc;
@@ -100,7 +100,7 @@ int main(int argc, char * argv[])
     acc = 0;
     for (step = 0 ; step < nsteq ; step ++)
     {   
-#ifdef ACCEPTANCE
+        #ifdef ACCEPTANCE
         if (step % 50 == 0)
         {
             std::cout << "Step = " << step / N <<  " (" << step << ")" << std::endl;
@@ -109,7 +109,7 @@ int main(int argc, char * argv[])
                 std::cout << "Acceptance rate: " <<  float(acc)/step/N * 100 << "%" << std::endl;
             }
         }
-#endif
+        #endif
         for (int step_i = 0 ; step_i < N ; step_i++)
         {
             pass = step_mc(particles, N, L, rng, step_size);
@@ -141,7 +141,7 @@ int main(int argc, char * argv[])
             10, fouriers, maxfouriernum, nfouriervals,  //fourier coeff
             50);                                        //g_r
 
-#ifdef ACCEPTANCE
+        #ifdef ACCEPTANCE
         if (step % 50 == 0)
         {
             std::cout << "Step = " << step / N <<  " (" << step << ")" << std::endl;
@@ -150,13 +150,13 @@ int main(int argc, char * argv[])
                 std::cout << "Acceptance rate: " <<  float(acc)/step / N * 100 << "%" << std::endl;
             }
         }
-#endif
+        #endif
     }
 
     // Post-processing
-#ifdef FOURIER
+    #ifdef FOURIER
     postprocess_fourier(L, fouriers, maxfouriernum, nfouriervals);
-#endif
+    #endif
     delete[] fouriers;
     delete[] particles;
 }

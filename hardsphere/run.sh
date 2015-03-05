@@ -10,7 +10,7 @@ if [ ! -e $CHEM220_IMGDIR ]; then
 fi
 
 if [ -z ${CHEM220_DATDIR+x} ]; then
-    CHEM220_IMGDIR=data
+    CHEM220_DATDIR=data
 fi
 if [ ! -e $CHEM220_DATDIR ]; then
     mkdir $CHEM220_DATDIR
@@ -69,7 +69,7 @@ fi
 if [ $1 == "HW2-SIM" ]; then
     echo "Submitted one hardsphere-fourier task"
     gcc hardsphere.cc -lstdc++ -o hardsphere-fourier -DFOURIER
-    ./hardsphere-fourier -nsteq 500 -nstmc 10000 -nstfourier 100 -step_size .7 \
+    ./hardsphere-fourier -nsteq 500 -nstmc 10000 -nstfourier 50 -step_size .7 \
         -maxfouriernum 100 > $CHEM220_DATDIR/fourier.csv &
 fi
 

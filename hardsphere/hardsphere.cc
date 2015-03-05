@@ -91,7 +91,7 @@ int main(int argc, char * argv[])
     double* particles = new double [3 * N];
     initialize_grid_linarr(particles, N_linear, L);
 
-    int nfouriervals = nstmc / 10 * 6;
+    int nfouriervals = nstmc / nstfourier * 6;
     double* fouriers = new double[maxfouriernum * nfouriervals];
     
     #ifdef VERBOSE

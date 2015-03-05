@@ -5,7 +5,7 @@ README for CHEM220B Solutions
 Basic Use, for HW Solutions
 =============================
 Example:
-CHEM220_IMGDIR=/home/jhaberstroh/Dropbox/CHEM220B ./run.sh HW1-SIM
+./run.sh HW1-SIM
 
 To use, execute ./run.sh with argument HW#-SIM or HW#-DATA. 
 

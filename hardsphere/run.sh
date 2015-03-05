@@ -69,7 +69,7 @@ fi
 if [ $1 == "HW2-SIM" ]; then
     echo "Submitted one hardsphere-fourier task"
     gcc hardsphere.cc -lstdc++ -o hardsphere-fourier -DFOURIER
-    ./hardsphere-fourier -nsteq 500 -nstmc 10000 -nstfourier 50 -step_size .7 \
+    ./hardsphere-fourier -nsteq 500 -nstmc 10000 -nstfourier 10 -step_size .7 \
         -maxfouriernum 100 > $CHEM220_DATDIR/fourier.csv &
 fi
 

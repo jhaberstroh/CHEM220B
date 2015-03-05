@@ -1,12 +1,14 @@
 import numpy as np
 import argparse
-import matplotlib.pyplot as plt
-
 parser = argparse.ArgumentParser()
 parser.add_argument("-dir", default="", 
         help="Path to csv files used in script")
 parser.add_argument("-save", help="Path to save images out")
 args = parser.parse_args()
+if not args.save is None:
+    import matplotlib
+    matplotlib.use("agg")
+import matplotlib.pyplot as plt
 
 txt = np.loadtxt(args.dir + "/" + "atoms.xyz", delimiter=',')
 print txt

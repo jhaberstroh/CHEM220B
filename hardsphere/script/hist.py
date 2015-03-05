@@ -1,15 +1,13 @@
 import numpy as np
 import argparse
 import os
-
 parser = argparse.ArgumentParser()
 parser.add_argument("-dir", default="", help="Path to csv files used in script")
 parser.add_argument("-save", help="Path to save images out")
 args = parser.parse_args()
-
-if args.save is None:
+if not args.save is None:
     import matplotlib
-    matplotlib.use("Agg")
+    matplotlib.use("agg")
 import matplotlib.pyplot as plt
 
 files=[args.dir + "/" + "small.csv",

@@ -1,11 +1,15 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-file", default="fourier.csv", help="Path to csv files used in script")
 parser.add_argument("-save", help="Path to save images out")
 args = parser.parse_args()
+
+if not args.save is None:
+    import matplotlib
+    matplotlib.use("agg")
+import matplotlib.pyplot as plt
 
 dat = np.loadtxt(args.file)
 print dat.shape
@@ -19,7 +23,10 @@ print coeff.shape
 mean = [np.mean(coeff[i,:]) for i in range(len(k))]
 std  = [np.std(coeff[i,:])  for i in range(len(k))]
 
-plt.plot(2*np.pi/k, mean)
+plt.plot(k, mean)
+plt.title("Mean of fourier distribution at different k")
+plt.xlabel("k, units of 1/diameter")
+plt.ylabel("Mean")
 if args.save is None:
     plt.show()
 else:
@@ -27,6 +34,9 @@ else:
     plt.clf()
 
 plt.plot(k, std)
+plt.title("Standard dev of fourier distribution at different k")
+plt.xlabel("k, units of 1/diameter")
+plt.ylabel("Standard deviation")
 if args.save is None:
     plt.show()
 else:
@@ -41,6 +51,9 @@ for val in values:
     print density.shape
     print bin_ctr.shape
     plt.plot(bin_ctr, np.log(density))
+    plt.title("Fourier coefficient distribution for k = {}".format(val))
+    plt.xlabel("k, units of 1/diameter")
+    plt.ylabel("Log likelihood")
 
     mean = np.mean(coeff[k_ind,:])
     std  = np.std(coeff[k_ind,:])

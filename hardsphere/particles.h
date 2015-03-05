@@ -183,7 +183,7 @@ void analyze_particles(double* particles, int N, int step, double L,
     if ((step % nstfourier == 0) && 
         (step / 10 * 6 < nfouriervals))
     {
-        int offset = (step / 10 / N) * 6;
+        int offset = (step / 10) * 6;
         for (int k = 0 ; k < maxfouriernum ; k++)
         {
             double kval = fourier_coeff(k,L);
@@ -231,7 +231,7 @@ void postprocess_fourier(double L, double* fouriers, int maxfouriernum,
 {
     for (int k = 0 ; k < maxfouriernum ; k++)
     {
-        std::cout << fourier_coeff(k,L) << ",";
+        std::cout << fourier_coeff(k,L) << " ";
         for (int nk = 0 ; nk < nfouriervals ; nk++)
         {
             std::cout << fouriers[k * nfouriervals + nk] << " ";

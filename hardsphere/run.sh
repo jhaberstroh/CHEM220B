@@ -2,7 +2,15 @@
 # Run with HW#-SIM or -DATA to run code for the corresponding homework assignment
 set -o errexit
 
-if [ -z $1 ]; then
+#SAVEDIR=/home/jhaberstroh/Dropbox/Physics/CHEM220B
+if [ -z ${SAVEDIR+x} ]; then
+    SAVEDIR=images
+fi
+if [ ! -e $SAVEDIR ]; then
+    mkdir $SAVEDIR
+fi
+
+if [ -z ${1+x} ]; then
     echo "Requires argument HW#-SIM or HW#-DATA to run"
     exit
 fi
@@ -14,6 +22,7 @@ fi
 if [ $1 == "TEST-MC" ]; then
     gcc hardsphere.cc -lstdc++ -o hardsphere-test -DVERBOSE -DXYZOUT -DACCEPTANCE
     if [ $? == 0 ]; then
+        ./hardsphere-test -h
         ./hardsphere-test -nsteq 100 -nstmc 100 -step_size .7
     fi
 fi
@@ -29,6 +38,8 @@ fi
 # HW 1
 # =============================================================================
 if [ $1 == "HW1-SIM" ]; then
+    echo "Submitted one hardsphere-xyz, one hardsphere-sol and three" \
+   " hardsphere-lg tasks"
     gcc hardsphere.cc -lstdc++ -o hardsphere-xyz -DXYZOUT
     ./hardsphere-xyz -nsteq 400 -step_size .7 > data/atoms.xyz & 
     
@@ -42,22 +53,30 @@ if [ $1 == "HW1-SIM" ]; then
 fi
 
 if [ $1 == "HW1-DATA" ]; then
-    python script/plotxyz.py -dir data
-    python script/hist.py -dir data
+    echo "Saving images to $SAVEDIR/hw1"
+    if [ ! -e $SAVEDIR/hw1 ]; then
+        mkdir $SAVEDIR/hw1
+    fi
+    python script/plotxyz.py -dir data -save $SAVEDIR/hw1
+    python script/hist.py -dir data -save $SAVEDIR/hw1
 fi
 
 # =============================================================================
 # HW 2
 # =============================================================================
 if [ $1 == "HW2-SIM" ]; then
+    echo "Submitted one hardsphere-fourier task"
     gcc hardsphere.cc -lstdc++ -o hardsphere-fourier -DFOURIER
-    if [ $? = 0 ]; then
-      ./hardsphere-fourier -nsteq 500 -nstmc 100000 -step_size .7 -maxfouriernum 100 > data/fourier.csv &
-    fi
+    ./hardsphere-fourier -nsteq 500 -nstmc 10000 -nstfourier 100 -step_size .7 \
+        -maxfouriernum 100 > data/fourier.csv &
 fi
 
 if [ $1 == "HW2-DATA" ]; then
-    python script/fourier.py -file data/fourier.csv
+    echo "Saving images to $SAVEDIR/hw2"
+    if [ ! -e $SAVEDIR/hw2 ]; then
+        mkdir $SAVEDIR/hw2
+    fi
+    python script/fourier.py -file data/fourier.csv -save $SAVEDIR/hw2
 fi
 
 # =============================================================================

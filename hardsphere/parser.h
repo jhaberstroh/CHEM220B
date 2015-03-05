@@ -1,12 +1,57 @@
 #ifndef __PARSER_H__
 #define __PARSER_H__
 #include <sstream>
-#include <cstdlib>
 #include <string.h>
+#include <vector>
+#include <sstream>
+#include <iostream>
+
+std::string default_line = "OPTIONS:";
+std::vector<std::string> PARSER_HELP(1, default_line);
+int HELP_PADDING=15;
+
+bool log_in_help(std::string log)
+{
+    for (int i = 0 ; i < PARSER_HELP.size() ; i++)
+    {
+        if (log.compare(PARSER_HELP[i]) == 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool help(int argc, char * argv[], int i)
+{
+    if (!strcmp(argv[i], "-h"))
+    {
+        for (int help_line = 0 ; help_line < PARSER_HELP.size(); help_line++)
+        {
+            std::cout << PARSER_HELP[help_line] << std::endl;
+        }
+        exit(1);
+    }
+}
+
 
 bool parse_int(int argc, char * argv[], int i, const char * argname, int * arg,
-    bool bVerbose = false)
+    const std::string& help="", bool bVerbose = false)
 {
+    std::ostringstream help_line;
+    int numspace = HELP_PADDING - strlen(argname);
+    help_line << argname;
+    for (int sp = 0 ; sp < numspace ; sp++)
+    {
+        help_line << " ";
+    }  
+    help_line << ": " << help;
+    std::string help_line_str = help_line.str();
+    if (!log_in_help(help_line_str))
+    {
+        PARSER_HELP.push_back(help_line_str);
+    }
+
     int output;
     if (!strcmp(argv[i], argname))
     {
@@ -33,8 +78,22 @@ bool parse_int(int argc, char * argv[], int i, const char * argname, int * arg,
 }
 
 bool parse_double(int argc, char * argv[], int i, const char * argname, double * arg,
-    bool bVerbose=false)
+    const std::string& help="", bool bVerbose=false)
 {
+    std::ostringstream help_line;
+    int numspace = HELP_PADDING - strlen(argname);
+    help_line << argname;
+    for (int sp = 0 ; sp < numspace ; sp++)
+    {
+        help_line << " ";
+    }  
+    help_line << ": " << help;
+    std::string help_line_str = help_line.str();
+    if (!log_in_help(help_line_str))
+    {
+        PARSER_HELP.push_back(help_line_str);
+    }
+
     double output;
     if (!strcmp(argv[i], argname))
     {

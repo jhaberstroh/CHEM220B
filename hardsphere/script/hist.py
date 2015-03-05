@@ -1,10 +1,16 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import argparse
+import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-dir", default="", help="Path to csv files used in script")
+parser.add_argument("-save", help="Path to save images out")
 args = parser.parse_args()
+
+if args.save is None:
+    import matplotlib
+    matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 
 files=[args.dir + "/" + "small.csv",
        args.dir + "/" + "large-2.0.csv",
@@ -29,9 +35,15 @@ for fname, bFit in zip(files,fit):
     hist[ hist < 100 ]  = 0
     # Cast integers to float to allow for normalization
     hist = hist.astype(np.float)
-    plt.plot(np.log(hist / np.sum(hist)), 'o')
+
+    if not bFit:
+        width = .1
+        plt.bar(bins[:-1] - bins[0] - width/2., hist/np.sum(hist), width=width)
     
     if bFit:
+        free_energy = np.log(hist / np.sum(hist))
+        min_fe = np.log(100/np.sum(hist))
+        plt.plot(free_energy, 'o')
         # FIT FUNCTION
         mean = np.mean(dat)
         std  = np.std(dat)
@@ -41,5 +53,13 @@ for fname, bFit in zip(files,fit):
         xfit = np.linspace(MIN, MAX, 1000)
         yfit = np.exp(-np.square( xfit - mean ) / (2 * std **2) ) * N
         plt.plot(xfit, np.log(yfit))
+        plt.vlines(mean, min_fe, 0)
+        plt.ylim([min_fe, 0])
     
-    plt.show()
+    if args.save is None:
+        plt.show()
+    else:
+        outname = os.path.split(fname)[-1]
+        outname = os.path.splitext(outname)[0]
+        plt.savefig(args.save+"/"+outname+".png")
+        plt.clf()

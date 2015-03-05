@@ -16,9 +16,9 @@ inline bool step_mc(double * particles, int N, double L,
     assert(atom < N);
     assert(atom >= 0);
     double *dr = new double[3];
-    dr[0] = rng.rand() * step_size;
-    dr[1] = rng.rand() * step_size;
-    dr[2] = rng.rand() * step_size;
+    dr[0] = rng.rand() * step_size - step_size / 2.;
+    dr[1] = rng.rand() * step_size - step_size / 2.;
+    dr[2] = rng.rand() * step_size - step_size / 2.;
     
     bool accept = true;
     for (int j = 0 ; j < N && accept ; j++)
@@ -52,16 +52,35 @@ int main(int argc, char * argv[])
     int maxfouriernum = 1;
     double density = .5;
     int nstxyz = 10;
+    int nstfourier = 10;
+    // Parsing functions included from module parser.h, a small header 
+    //    library that I wrote to make parsing command line arguments
+    //    more transparent and modular.
+    // Unfortunately, it does not automatically build a help file.
     for (arg_i = 1 ; arg_i < argc ; arg_i++)
     {
-        parse_int(argc, argv, arg_i, "-nsteq", &nsteq);
-        parse_int(argc, argv, arg_i, "-nstmc", &nstmc);
-        parse_int(argc, argv, arg_i, "-seed", &seed);
-        parse_double(argc, argv, arg_i, "-step_size", &step_size);
-        parse_double(argc, argv, arg_i, "-probe", &probe_rad);
-        parse_int(argc, argv, arg_i, "-maxfouriernum", &maxfouriernum);
-        parse_double(argc, argv, arg_i, "-density", &density);
-        parse_int(argc, argv, arg_i, "-nstxyz", &nstxyz);
+        parse_int(argc, argv, arg_i, "-nsteq", &nsteq, 
+            "Number of sweeps for equilibration process");
+        parse_int(argc, argv, arg_i, "-nstmc", &nstmc, 
+            "Number of sweeps for production monte-carlo");
+        parse_int(argc, argv, arg_i, "-seed", &seed, "Seed number");
+        parse_double(argc, argv, arg_i, "-step_size", &step_size, 
+            "Step size for MC moveset");
+        parse_double(argc, argv, arg_i, "-density", &density, 
+            "Density of simulation, in units of N/V");
+        parse_double(argc, argv, arg_i, "-probe", &probe_rad, 
+            "Radius for probe volume, units of particle diameters");
+        #ifdef XYZ
+        parse_int(argc, argv, arg_i, "-nstxyz", &nstxyz, 
+            "Number of steps between performing position tracking");
+        #endif //XYZ
+        #ifdef FOURIER
+        parse_int(argc, argv, arg_i, "-maxfouriernum", &maxfouriernum, 
+            "Max fourier mode above the fundamental to record");
+        parse_int(argc, argv, arg_i, "-nstfourier", &nstfourier, 
+            "Max fourier mode above the fundamental to record");
+        #endif //FOURIER
+        help(argc, argv, arg_i);
     }
 
     int N_linear = 10;
@@ -98,6 +117,7 @@ int main(int argc, char * argv[])
     // Perform the equilibration Monte Carlo loop
     // ============================================
     acc = 0;
+    // Steps are counted in units of number-of-sweeps out of convention
     for (step = 0 ; step < nsteq ; step ++)
     {   
         #ifdef ACCEPTANCE
@@ -110,6 +130,7 @@ int main(int argc, char * argv[])
             }
         }
         #endif
+        // step_mc is included step-by-step for modularity and clarity
         for (int step_i = 0 ; step_i < N ; step_i++)
         {
             pass = step_mc(particles, N, L, rng, step_size);
@@ -138,7 +159,7 @@ int main(int argc, char * argv[])
         analyze_particles(particles, N, step, L,
             nstxyz, 0,                                  //xyz
             10, probe_rad,                              //probe volume
-            10, fouriers, maxfouriernum, nfouriervals,  //fourier coeff
+            nstfourier, fouriers, maxfouriernum, nfouriervals,  //fourier coeff
             50);                                        //g_r
 
         #ifdef ACCEPTANCE

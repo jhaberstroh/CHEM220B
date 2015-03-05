@@ -1,9 +1,21 @@
-Solutions for CHEM220B
+README for CHEM220B Solutions
 =============================
-To use, execute ./run.sh with argument HW#-SIM or HW#-DATA.
+Example:
+CHEM220_IMGDIR=/home/jhaberstroh/Dropbox/CHEM220B ./run.sh HW1-SIM
 
-To set the output directory, pass the environment variable SAVEDIR
-to the execution script.
+To use, execute ./run.sh with argument HW#-SIM or HW#-DATA. Pass -h to
+query any flags that can be set in the programs.
+
+Environmental variables:
+CHEM220_IMGDIR    - Directory to save images to. If not set, defaults 
+                    to ./image
+CHEM220_DATDIR    - Directory to save data to. If not set, defaults to
+                    ./data
+
+Note about environment variables: You can also export environment variables 
+if you would like to run multiple assignments without passing the environment 
+variable repeatedly.
 
 Example:
-SAVEDIR=/home/jhaberstroh/Dropbox/CHEM220B ./run.sh HW1-SIM
+export CHEM220_IMDIR=/home/jhaberstroh/Dropbox/CHEM220B
+./run.sh HW{1..3}-SIM

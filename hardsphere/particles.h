@@ -180,10 +180,10 @@ void analyze_particles(double* particles, int N, int step, double L,
     }
     #endif
     #ifdef FOURIER
+    int offset = (step / nstfourier) * 6;
     if ((step % nstfourier == 0) && 
-        (step / 10 * 6 < nfouriervals))
+        (offset < nfouriervals))
     {
-        int offset = (step / 10) * 6;
         for (int k = 0 ; k < maxfouriernum ; k++)
         {
             double kval = fourier_coeff(k,L);

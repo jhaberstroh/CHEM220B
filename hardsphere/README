@@ -1,0 +1,9 @@
+Solutions for CHEM220B
+=============================
+To use, execute ./run.sh with argument HW#-SIM or HW#-DATA.
+
+To set the output directory, pass the environment variable SAVEDIR
+to the execution script.
+
+Example:
+SAVEDIR=/home/jhaberstroh/Dropbox/CHEM220B ./run.sh HW1-SIM

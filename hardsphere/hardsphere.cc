@@ -70,10 +70,10 @@ int main(int argc, char * argv[])
             "Density of simulation, in units of N/V");
         parse_double(argc, argv, arg_i, "-probe", &probe_rad, 
             "Radius for probe volume, units of particle diameters");
-        #ifdef XYZ
+        #ifdef XYZOUT
         parse_int(argc, argv, arg_i, "-nstxyz", &nstxyz, 
             "Number of steps between performing position tracking");
-        #endif //XYZ
+        #endif //XYZOUT
         #ifdef FOURIER
         parse_int(argc, argv, arg_i, "-maxfouriernum", &maxfouriernum, 
             "Max fourier mode above the fundamental to record");

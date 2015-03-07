@@ -1,6 +1,14 @@
 import numpy as np
 import argparse
 import os
+
+def safesaveplot(savedir=None, name=None):
+    if savedir is None:
+        plt.show()
+    else:
+        plt.savefig(savedir+'/'+name)
+        plt.clf()
+
 parser = argparse.ArgumentParser()
 parser.add_argument("-dir", default="", help="Path to csv files used in script")
 parser.add_argument("-save", help="Path to save images out")
@@ -19,7 +27,11 @@ fit=[False,
         True,
         True,
         True]
+diameter=np.array([.9, 2, 3, 4])
+means   =np.zeros(diameter.size)
+stds    =np.zeros(diameter.size)
 
+i=0
 for fname, bFit in zip(files,fit):
     dat = np.loadtxt(fname)
     plt.title(fname)
@@ -33,6 +45,9 @@ for fname, bFit in zip(files,fit):
     hist[ hist < 100 ]  = 0
     # Cast integers to float to allow for normalization
     hist = hist.astype(np.float)
+    means[i] = np.mean(dat)
+    stds[i]  = np.std(dat)
+    i += 1
 
     if not bFit:
         width = .1
@@ -54,10 +69,26 @@ for fname, bFit in zip(files,fit):
         plt.vlines(mean, min_fe, 0)
         plt.ylim([min_fe, 0])
     
-    if args.save is None:
-        plt.show()
-    else:
-        outname = os.path.split(fname)[-1]
-        outname = os.path.splitext(outname)[0]
-        plt.savefig(args.save+"/"+outname+".png")
-        plt.clf()
+    outname = os.path.split(fname)[-1]
+    outname = os.path.splitext(outname)[0]
+    safesaveplot(args.save, outname+".png")
+
+xmax = 4.5
+x = np.linspace(0, xmax, 100)
+r = x / 2.
+density = .5
+pv = 4./3. * np.pi * np.power(r,3) * density
+plt.plot(x, pv)
+
+plt.plot(diameter, means, 'o')
+plt.vlines(diameter, means-stds, means+stds)
+plt.xlim([0, xmax])
+plt.title("Mean with diameter, compared to estimate")
+plt.xlabel("Diameter, units of hardsphere radii")
+safesaveplot(args.save, "/density-mean-var.png")
+
+plt.plot(diameter, stds**2, 'o')
+plt.title("Variance with diameter")
+plt.xlabel("Diameter, units of hardsphere radii")
+plt.xlim([0, xmax])
+safesaveplot(args.save, "/density-var.png")

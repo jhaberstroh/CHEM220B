@@ -81,7 +81,9 @@ pv = 4./3. * np.pi * np.power(r,3) * density
 plt.plot(x, pv)
 
 plt.plot(diameter, means, 'o')
-plt.vlines(diameter, means-stds, means+stds)
+#plt.vlines(diameter, means-stds, means+stds)
+plt.plot(diameter, means-stds)
+plt.plot(diameter, means+stds)
 plt.xlim([0, xmax])
 plt.title("Mean with diameter, compared to estimate")
 plt.xlabel("Diameter, units of hardsphere radii")

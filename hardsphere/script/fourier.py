@@ -1,6 +1,12 @@
 import numpy as np
 import argparse
 
+def safesaveplot(savedir=None, name=None):
+    if savedir is None:
+        plt.show()
+    else:
+        plt.savefig(savedir+'/'+name)
+        plt.clf()
 parser = argparse.ArgumentParser()
 parser.add_argument("-file", default="fourier.csv", help="Path to csv files used in script")
 parser.add_argument("-save", help="Path to save images out")
@@ -29,12 +35,14 @@ plt.xlabel("k, units of 1/diameter")
 plt.ylabel("Mean, Standard deviation")
 plt.plot(k,  std)
 plt.plot(k, -std)
-plt.title("Standard dev of fourier distribution at different k")
-if args.save is None:
-    plt.show()
-else:
-    plt.savefig(args.save+"/"+"fourier_mean_std.png")
-    plt.clf()
+safesaveplot(args.save,"fourier_mean_std.png")
+
+N = 1000
+plt.plot(k,  std**2/N)
+plt.xlabel("k, units of 1/diameter")
+plt.ylabel("Variance")
+plt.title("Variance of fourier distribution at different k")
+safesaveplot(args.save,"fourier_var.png")
 
 values = [ np.pi, 2. * np. pi, 3. * np.pi ]
 for val in values:

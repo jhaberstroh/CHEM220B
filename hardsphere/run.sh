@@ -110,6 +110,9 @@ if [ $1 == "HW3-SIM" ]; then
 fi
 
 if [ $1 == "HW3-DATA" ]; then
+    if [ ! -e $CHEM220_IMGDIR/hw3 ]; then
+        mkdir $CHEM220_IMGDIR/hw3
+    fi
     python script/gr.py $CHEM220_DATDIR/gr_*.csv -save $CHEM220_IMGDIR/hw3
 fi
 

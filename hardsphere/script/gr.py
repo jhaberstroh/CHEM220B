@@ -26,14 +26,26 @@ print args.file
 for fname in args.file:
     dat = np.loadtxt(fname)
     print dat.shape
+    outname = os.path.split(fname)[-1]
+    outname = os.path.splitext(outname)[0]
+    ind = outname.index("_")
+    density = float("." + outname[ind+1:])
     
+    N_frames = 5000/50
+    # Half particles used becasue factor of 2 for symmetry in distance has
+    #  already been accounted for
+    half_particles = 500
+
     bins = np.linspace(1,5,41)
-    density, bins = np.histogram(dat[dat != 0], bins=bins)
-    bin_ctr = (bins[:-1] + bins[1:]) / 2.
-    plt.plot(bin_ctr, density / (4 * np.pi * np.square(bin_ctr)))
+    N_R, bins = np.histogram(dat[dat != 0], bins=bins)
+    N_R /= (N_frames * half_particles)
+    bin_ctr  = (bins[1:] + bins[:-1]) / 2.
+    bin_size = (bins[1:] - bins[:-1])
+    plt.plot(bin_ctr, N_R / (4 * np.pi * np.square(bin_ctr) * bin_size * density) )
     plt.xlim([0,max(bin_ctr)])
     
-    basename=os.path.basename(fname)
-    safesaveplot(args.save, basename + ".png")
+    outname = os.path.split(fname)[-1]
+    outname = os.path.splitext(outname)[0]
+    safesaveplot(args.save, outname + ".png")
 
 

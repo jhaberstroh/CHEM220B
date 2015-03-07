@@ -85,23 +85,32 @@ fi
 # HW 3
 # =============================================================================
 if [ $1 == "HW3-SIM" ]; then
+    nstmc=5000
+    DATA_MB=$(echo "(1000 * 1000 / 2) * ($nstmc / 50) * 10 * 2.3 / 1024 / 1024" | bc)
+    echo "This run will generate something like $DATA_MB MB of data"
+    read -p "Would you like to proceed (press y to contine)? " -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit
+    fi
+    echo "Submitting ten hardsphere-gr jobs"
     gcc hardsphere.cc -lstdc++ -o hardsphere-gr -DGR
     if [ $? = 0 ]; then
-        ./hardsphere-gr -nsteq 500 -nstmc 5000 -step_size  .05 -density  .9 > $CHEM220_DATDIR/gr_9.csv  &
-        ./hardsphere-gr -nsteq 500 -nstmc 5000 -step_size   .1 -density  .8 > $CHEM220_DATDIR/gr_8.csv  &
-        ./hardsphere-gr -nsteq 500 -nstmc 5000 -step_size  .15 -density  .7 > $CHEM220_DATDIR/gr_7.csv  &
-        ./hardsphere-gr -nsteq 500 -nstmc 5000 -step_size   .2 -density  .6 > $CHEM220_DATDIR/gr_6.csv  &
-        ./hardsphere-gr -nsteq 500 -nstmc 5000 -step_size   .4 -density  .5 > $CHEM220_DATDIR/gr_5.csv  &
-        ./hardsphere-gr -nsteq 500 -nstmc 5000 -step_size  1.0 -density  .4 > $CHEM220_DATDIR/gr_4.csv  &
-        ./hardsphere-gr -nsteq 500 -nstmc 5000 -step_size  2.0 -density  .3 > $CHEM220_DATDIR/gr_3.csv  &
-        ./hardsphere-gr -nsteq 500 -nstmc 5000 -step_size  5.0 -density  .2 > $CHEM220_DATDIR/gr_2.csv  &
-        ./hardsphere-gr -nsteq 500 -nstmc 5000 -step_size 10.0 -density  .1 > $CHEM220_DATDIR/gr_1.csv  &
-        ./hardsphere-gr -nsteq 500 -nstmc 5000 -step_size 10.0 -density .02 > $CHEM220_DATDIR/gr_02.csv &
+        ./hardsphere-gr -nsteq 500 -nstmc $nstmc -step_size  .05 -density  .9 > $CHEM220_DATDIR/gr_9.csv  &
+        ./hardsphere-gr -nsteq 500 -nstmc $nstmc -step_size   .1 -density  .8 > $CHEM220_DATDIR/gr_8.csv  &
+        ./hardsphere-gr -nsteq 500 -nstmc $nstmc -step_size  .15 -density  .7 > $CHEM220_DATDIR/gr_7.csv  &
+        ./hardsphere-gr -nsteq 500 -nstmc $nstmc -step_size   .2 -density  .6 > $CHEM220_DATDIR/gr_6.csv  &
+        ./hardsphere-gr -nsteq 500 -nstmc $nstmc -step_size   .4 -density  .5 > $CHEM220_DATDIR/gr_5.csv  &
+        ./hardsphere-gr -nsteq 500 -nstmc $nstmc -step_size  1.0 -density  .4 > $CHEM220_DATDIR/gr_4.csv  &
+        ./hardsphere-gr -nsteq 500 -nstmc $nstmc -step_size  2.0 -density  .3 > $CHEM220_DATDIR/gr_3.csv  &
+        ./hardsphere-gr -nsteq 500 -nstmc $nstmc -step_size  5.0 -density  .2 > $CHEM220_DATDIR/gr_2.csv  &
+        ./hardsphere-gr -nsteq 500 -nstmc $nstmc -step_size 10.0 -density  .1 > $CHEM220_DATDIR/gr_1.csv  &
+        ./hardsphere-gr -nsteq 500 -nstmc $nstmc -step_size 10.0 -density .02 > $CHEM220_DATDIR/gr_02.csv &
     fi
 fi
 
 if [ $1 == "HW3-DATA" ]; then
-    python script/gr.py $CHEM220_DATDIR/gr_*.csv
+    python script/gr.py $CHEM220_DATDIR/gr_*.csv -save $CHEM220_IMGDIR/hw3
 fi
 
 

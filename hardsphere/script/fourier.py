@@ -29,16 +29,16 @@ print coeff.shape
 mean = np.array([np.mean(coeff[i,:]) for i in range(len(k))])
 std  = np.array([np.std(coeff[i,:])  for i in range(len(k))])
 
-plt.plot(k, mean)
+N = 1000
+plt.plot(k, mean*N)
 plt.title("Mean of fourier distribution at different k")
 plt.xlabel("k, units of 1/diameter")
 plt.ylabel("Mean, Standard deviation")
-plt.plot(k,  std)
-plt.plot(k, -std)
+plt.plot(k,  std*N)
+plt.plot(k, -std*N)
 safesaveplot(args.save,"fourier_mean_std.png")
 
-N = 1000
-plt.plot(k,  std**2/N)
+plt.plot(k,  std**2*N)
 plt.xlabel("k, units of 1/diameter")
 plt.ylabel("Variance")
 plt.title("Variance of fourier distribution at different k")

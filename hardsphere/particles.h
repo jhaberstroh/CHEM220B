@@ -189,7 +189,7 @@ void analyze_particles(double* particles, int N, int step, double L,
             double kval = fourier_coeff(k,L);
             int k_i = (k * nfouriervals) + offset;
 
-            for (int i = 0 ; i < 6 ; i++)
+            for (int i = 0 ; i < 2*3 ; i++)
             {
                 fouriers[k_i + i] = 0;
             }
@@ -200,10 +200,6 @@ void analyze_particles(double* particles, int N, int step, double L,
                     fouriers[k_i+j  ] += cos(particles[3*i+j] * kval);
                     fouriers[k_i+j+3] += sin(particles[3*i+j] * kval);
                 }
-            }
-            for (int i = 0 ; i < 6 ; i++)
-            {
-                fouriers[k_i + i] /= double(N);
             }
         }
     }

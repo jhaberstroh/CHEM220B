@@ -38,6 +38,7 @@ for fname in args.file:
 
     bins = np.linspace(1,5,41)
     N_R, bins = np.histogram(dat[dat != 0], bins=bins)
+    N_R = N_R.astype(float)
     N_R /= float(N_frames * half_particles)
     bin_ctr  = (bins[1:] + bins[:-1]) / 2.
     bin_size = (bins[1:] - bins[:-1])

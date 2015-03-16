@@ -1,9 +1,24 @@
 import numpy as np
 import numpy.linalg as LA
-import numpy.fft as FFT
-import matplotlib.pyplot as plt
 import argparse
+def safesaveplot(savedir=None, name=None):
+    if savedir is None:
+        plt.show()
+    else:
+        plt.savefig(savedir+'/'+name)
+        plt.clf()
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-plot", action="store_true")
+parser.add_argument("-gaw", action="store_true")
+parser.add_argument("-dmu", action="store_true")
+parser.add_argument("-gaa", action="store_true")
+parser.add_argument("-save", help="Path to save images out")
+args = parser.parse_args()
+if not args.save is None:
+    import matplotlib
+    matplotlib.use("agg")
+import matplotlib.pyplot as plt
 
 
 
@@ -16,12 +31,12 @@ def pc_coefficient_mtx(h_nl_interp, R_AW_A, r, basis_r, k, basis_k, bplot = Fals
         plt.plot(r, basis_r[1,:])
         plt.plot(r, basis_r[2,:])
         plt.plot(r, basis_r[3,:])
-        plt.show()
+        safesaveplot(args.save, "basis_r")
         plt.plot(k, basis_k[0,:])
         plt.plot(k, basis_k[1,:])
         plt.plot(k, basis_k[2,:])
         plt.plot(k, basis_k[3,:])
-        plt.show()
+        safesaveplot(args.save, "basis_k")
     
     # ====================================================
     # Compute overlaps (no units)
@@ -43,7 +58,7 @@ def pc_coefficient_mtx(h_nl_interp, R_AW_A, r, basis_r, k, basis_k, bplot = Fals
             overlap_fun_r = basis_r[i,:] * basis_r[j,:] * 4 * np.pi * np.power(r,2)
             if bplot:
                 plt.plot(r,overlap_fun_r)
-                plt.show()
+                safesaveplot(args.save, "overlap_{}-{}".format(i,j))
             overlap_val = np.sum((overlap_fun_r[1:] + overlap_fun_r[:-1]) / 2. * dr)
             if bplot:
                 print "Overlap {}-{} = {}".format(i, j, overlap_val)
@@ -59,7 +74,7 @@ def pc_coefficient_mtx(h_nl_interp, R_AW_A, r, basis_r, k, basis_k, bplot = Fals
             integrand_k = basis_k[i,:] * basis_k[j,:] * h_nl_interp * np.power(k,2)
             if bplot:
                 plt.plot(k, integrand_k)
-                plt.show()
+                safesaveplot(args.save, "interact_{}-{}".format(i,j))
             interact_val = np.sum((integrand_k[1:] + integrand_k[:-1]) / 2. * dk)
             if bplot:
                 print "Interact {}-{} = {}".format(i, j, interact_val)
@@ -72,7 +87,7 @@ def pc_coefficient_mtx(h_nl_interp, R_AW_A, r, basis_r, k, basis_k, bplot = Fals
     interact_R = interact / R_AW_A**3  * ( 4. * np.pi / (2 * np.pi)**3)
     return norm_R, overlap_R, interact_R
 
-def compute_gr(sig_A_A = 2.7, bplot = False):
+def compute_gr(sig_A_A = 2.7, bplot = False, bcoeff = False):
     sig_W_A = 2.7
     R_AW_A  = (sig_A_A + sig_W_A) / 2.
 
@@ -117,7 +132,7 @@ def compute_gr(sig_A_A = 2.7, bplot = False):
         plt.plot(k_nl, h_nl)
         plt.plot(k, h_nl_interp)
         plt.xlim([min(k_nl), max(k_nl) + 5])
-        plt.show()
+        safesaveplot(args.save, "narten-levy")
     
 
     norm_R, overlap_R, interact_R = pc_coefficient_mtx(h_nl_interp, R_AW_A, 
@@ -133,6 +148,8 @@ def compute_gr(sig_A_A = 2.7, bplot = False):
     A = overlap_R + interact_R
     b = norm_R
     c_AW_i = LA.solve(A,-b)
+    if bcoeff:
+        print c_AW_i
     c_AW_r = np.zeros(N)
     c_AW_k = np.zeros(N)
     for i in xrange(4):
@@ -165,24 +182,18 @@ def compute_gr(sig_A_A = 2.7, bplot = False):
     return r_gr, g_AW_r + g_AW_r2 + 1, h_AA_r + 1
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-plot", action="store_true")
-    parser.add_argument("-gaw", action="store_true")
-    parser.add_argument("-dmu", action="store_true")
-    parser.add_argument("-gaa", action="store_true")
-    args = parser.parse_args()
     
     if args.gaw:
         l = []
         for sig_A in np.linspace(3, 5, 3):
-            r, g_AW_r, g_AA_r = compute_gr(sig_A)
+            r, g_AW_r, g_AA_r = compute_gr(sig_A, bcoeff=True)
             R = (sig_A + 2.7) / 2.
             plt.plot(r - R, g_AW_r)
             l.append("sig={}".format(sig_A))
         plt.title("g_AW(r) at different radii")
         plt.xlabel("Solute diameter, Angstrom")
         plt.legend(l)
-        plt.show()
+        safesaveplot(args.save, "gAW")
    
     if args.dmu:
         N_R = 40
@@ -205,15 +216,23 @@ def main():
         delta_mu = np.cumsum((integrand[1:] + integrand[:-1]) / 2. * np.diff(R_list))
         delta_mu *= factor
         delta_mu = np.insert(delta_mu, 0, 0.)
-        plt.plot(sig_A_list, delta_mu)
+        plt.plot(np.power(sig_A_list, 3), delta_mu , '--o')
+        ax1 = plt.gca()
+        tick_max = max(np.power(sig_A_list,3))
+        tick_loc = np.linspace(0, tick_max * 1.1, 9)
+    
+        tick_label = ["%.1f" % np.power(x, 1./3.) for x in tick_loc]
+        ax1.set_xticks(tick_loc)
+        ax1.set_xticklabels(tick_label)
+
         plt.title("Solvation free energy for hydrophobe from Pratt-Chandler")
         plt.ylabel("Delta mu, KCal/mol")
-        plt.xlabel("Solute diameter, Angstrom")
-        plt.show()
+        plt.xlabel("Solute Diameter, Angstrom (cubic scale)")
+        safesaveplot(args.save, "solvation_mu")
 
     if args.gaa:
         l = []
-        for sig_A in np.linspace(1, 7, 3):
+        for sig_A in np.linspace(3, 5, 3):
             r, g_AW_r, g_AA_r = compute_gr(sig_A)
             R = (sig_A + 2.7) / 2.
             plt.plot(r - sig_A, g_AA_r)
@@ -221,15 +240,9 @@ def main():
         plt.title("g_AA(r) at different radii")
         plt.xlabel("Solute Diameter, Angstrom")
         plt.legend(l)
-        plt.show()
+        safesaveplot(args.save, "gAA")
 
         
-    
-    
-
-    
-    
-
 
 if __name__ == "__main__":
     main()

@@ -9,6 +9,8 @@ def safesaveplot(savedir=None, name=None):
     else:
         plt.savefig(savedir+'/'+name)
         plt.clf()
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument("file", nargs="+", 
         help="Path to csv files used in script")
@@ -36,7 +38,7 @@ for fname in args.file:
     #  already been accounted for
     half_particles = 500
 
-    bins = np.linspace(1,5,41)
+    bins = np.linspace(1,5,101)
     N_R, bins = np.histogram(dat[dat != 0], bins=bins)
     N_R = N_R.astype(float)
     N_R /= float(N_frames * half_particles)
@@ -44,6 +46,12 @@ for fname in args.file:
     bin_size = (bins[1:] - bins[:-1])
     plt.plot(bin_ctr, N_R / (4 * np.pi * np.square(bin_ctr) * bin_size * density) )
     plt.xlim([0,max(bin_ctr)])
+    plt.ylim([0,4.5])
+    plt.ylabel("g(r)")
+    plt.xlabel("r, particle diameters")
+    plt.title("Density = {}".format(density))
+    fig = matplotlib.pyplot.gcf()
+    fig.set_size_inches(3.0, 2.5)
     
     outname = os.path.split(fname)[-1]
     outname = os.path.splitext(outname)[0]

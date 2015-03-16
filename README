@@ -1,0 +1,52 @@
+README for CHEM220B Solutions
+=============================
+
+=============================
+Basic Use, for HW Solutions
+=============================
+Example:
+./run.sh HW1-SIM
+
+To use, execute ./run.sh with argument HW#-SIM or HW#-DATA. 
+
+
+Environmental variables:
+CHEM220_IMGDIR    - Directory to save images to. If not set, defaults 
+                    to ./image
+CHEM220_DATDIR    - Directory to save data to. If not set, defaults to
+                    ./data
+
+Note about environment variables: You can also export environment variables 
+if you would like to run multiple assignments without passing the environment 
+variable repeatedly.
+
+Example:
+export CHEM220_IMDIR=/home/jhaberstroh/Dropbox/CHEM220B
+./run.sh HW{1..3}-SIM
+
+
+Use ./run.sh TEST-MC to run a simple test of the program behavior
+
+=============================
+Advanced Use
+=============================
+Compile hardsphere.cc with appropriate flags (-D...) to turn on different
+output and analysis modes. All output will be returned via stdout.
+
+Flags:
+VERBOSE      - Turn on standard warnings and talk. Leave off for 
+               data generation
+ACCEPTANCE   - Turn on acceptance rate print statements
+XYZOUT       - Turn on XYZ position tracking for a particle
+SMALLSPHERE  - Turn on single small-sphere Nv tracking
+LARGESPHERE  - Turn on Nv tracking for a sphere of radius designated by
+               passed argument
+FOURIER      - Turn on fourier coefficient tracking
+GR           - Turn on g(r) tracking
+
+With any compilation, pass -h to query any flags that can be set in the 
+program. Each flag type will turn on additional options within the
+program, and not all modularities are yet added to the program.
+
+Example:
+g++ hardsphere.cc -o hardsphere-test -DVERBOSE -DXYZOUT -DACCEPTANCE

@@ -23,17 +23,14 @@ fi
 
 if [ $1 == "TEST-MC" ]; then
     gcc hardsphere.cc -lstdc++ -o hardsphere-test -DVERBOSE -DXYZOUT -DACCEPTANCE
-    if [ $? == 0 ]; then
-        ./hardsphere-test -h
-        ./hardsphere-test -nsteq 100 -nstmc 100 -step_size .7
-    fi
+    ./hardsphere-test -h
+    ./hardsphere-test -nsteq 100 -nstmc 100 -step_size .7
 fi
 
 if [ $1 == "TEST-LJ" ]; then
     gcc lj.cc -lstdc++ -o lj-test -DXYZOUT
-    if [ $? == 0 ]; then
-        ./lj-test -nsteq 10000 -nstmc 100 -dt .1
-    fi
+    ./lj-test -nsteq 1000 -nstmc 100 -nstxyz 10 > $CHEM220_DATDIR/lj.xyz
+    # vmd $CHEM220_DATDIR/lj.xyz
 fi
 
 # =============================================================================

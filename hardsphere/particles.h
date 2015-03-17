@@ -140,9 +140,23 @@ void analyze_particles(double* particles, int N, int step, double L,
     #ifdef XYZOUT
     if (step % nstxyz == 0)
     {
-        printf("%f, %f, %f\n", particles[3 * particle_num], 
-                               particles[3 * particle_num + 1], 
-                               particles[3 * particle_num + 2]);
+        if (particle_num < N)
+        {
+            printf("%f, %f, %f\n", particles[3 * particle_num], 
+                                particles[3 * particle_num + 1], 
+                                particles[3 * particle_num + 2]);
+        }
+        if (particle_num == N)
+        {
+            printf("%d\n", N);
+            printf("No comment\n", N);
+            for (int n = 0 ; n < N ; n ++)
+            {
+                printf("X %f %f %f\n", particles[3 * n], 
+                                    particles[3 * n + 1], 
+                                    particles[3 * n + 2]);
+            }
+        }
     }
     #endif
     #ifdef SMALLSPHERE

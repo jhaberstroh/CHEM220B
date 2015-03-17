@@ -22,6 +22,7 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <cstdlib>
 
 std::string default_line = "OPTIONS:";
 std::vector<std::string> PARSER_HELP(1, default_line);

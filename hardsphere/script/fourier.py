@@ -1,6 +1,5 @@
 import numpy as np
 import argparse
-
 def safesaveplot(savedir=None, name=None):
     if savedir is None:
         plt.show()
@@ -11,11 +10,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-file", default="fourier.csv", help="Path to csv files used in script")
 parser.add_argument("-save", help="Path to save images out")
 args = parser.parse_args()
-
 if not args.save is None:
     import matplotlib
     matplotlib.use("agg")
 import matplotlib.pyplot as plt
+
+
 
 dat = np.loadtxt(args.file)
 print dat.shape

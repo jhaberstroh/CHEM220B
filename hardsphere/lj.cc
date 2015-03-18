@@ -130,6 +130,7 @@ int main(int argc, char * argv[])
     double probe_rad = .45;
     int maxfouriernum = 1;
     double T = 3.0;
+    int N_linear = 6;
 
     for (int arg_i = 1 ; arg_i < argc ; arg_i++)
     {
@@ -142,12 +143,12 @@ int main(int argc, char * argv[])
         parse_double(argc, argv, arg_i, "-density", &density);
         parse_double(argc, argv, arg_i, "-dt", &dt);
         parse_int(argc, argv, arg_i, "-nstxyz", &nstxyz);
+        parse_int(argc, argv, arg_i, "-N_linear", &N_linear);
     }
     int nfouriervals = nstmd / 10 * 6;
     double* fouriers = new double[maxfouriernum * nfouriervals];
     
     MTRand rng(seed);
-    int N_linear = 6;
     int N = N_linear * N_linear * N_linear;
     assert(density > 0.0 && density < 1.0);
     double L = double(N_linear) * cbrt(1./density);
@@ -164,15 +165,33 @@ int main(int argc, char * argv[])
       << ", N = " << N << std::endl;
     #endif
 
+    // Equilibration
     int step = 0;
     for (step = 0 ; step < nsteq ; step++)
     {
-        #ifdef VERBOSE
         if (step % 50 == 0)
         {
-            std::cout << "Step " << step << std::endl;
+            std::cerr << "Step " << step << std::endl;
         }
-        #endif
+
+        double Utot_out = 0;
+        step_mc_verlet(particles, velocity, N, ljdiameter, ljenergy, 
+           ljcutoff, dt, L, Utot_out);
+
+        if (step % 50 == 0 && step != 0)
+        {
+            remove_com(velocity, N);
+            thermostat_vrescale(velocity, N, T);
+        }
+    }
+
+    // Production
+    for (step = 0 ; step < nstmd ; step++)
+    {
+        if (step % 50 == 0)
+        {
+            std::cerr << "Step " << step << std::endl;
+        }
 
         double Utot_out = 0;
         double Ktot;
@@ -180,20 +199,30 @@ int main(int argc, char * argv[])
            ljcutoff, dt, L, Utot_out);
         Utot = Utot_out;
         Ktot = kinetic_energy(velocity, N);
-        std::cerr << "Potential Energy: " << Utot;
-        std::cerr << " Kinetic Energy: " << Ktot << std::endl;
+        
+        #ifdef ENERGY
+        std::cout << Utot << " " << Ktot << std::endl;
+        #endif //ENERGY
 
-        if (step % 50 == 0 && step != 0)
+        #ifdef VELOCITY
+        if (step % 10 == 0 && step != 0)
         {
-            remove_com(velocity, N);
-            thermostat_vrescale(velocity, N, T);
+            for (int index = 0 ; index < N ; index++)
+            {
+              std::cout << velocity[3*index + 0 ] << " ";
+              std::cout << velocity[3*index + 1 ] << " ";
+              std::cout << velocity[3*index + 2 ] << " ";
+            }
+            std::cout << std::endl;
         }
+        #endif //VELOCITY
 
         analyze_particles(particles, N, step, L,
             nstxyz, N,                               //xyz
             10, probe_rad,                              //probe volume
             10, fouriers, maxfouriernum, nfouriervals,  //fourier coeff
             50);                                        //g_r
+
     }
 
     delete[] fouriers;

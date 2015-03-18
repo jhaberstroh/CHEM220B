@@ -115,11 +115,20 @@ fi
 
 
 # =============================================================================
-# HW 5
+# HW 6
 # =============================================================================
-#if [ $1 == "HW5-SIM" ]; then
-#    gcc lj.cc -lstdc++ -o lj -DVERBOSE
-#    if [ $? = 0 ]; then
-#        ./lj
-#    fi
-#fi
+if [ $1 == "HW6-SIM" ]; then
+    gcc lj.cc -lstdc++ -o lj-velocity -DVELOCITY
+    gcc lj.cc -lstdc++ -o lj-energy -DENERGY
+    #./lj-energy > $CHEM220_DATDIR/lj-energy.txt
+    ./lj-velocity -N_linear 6 -nstmd 3000 > $CHEM220_DATDIR/lj-velocity.txt
+    split -l 10 $CHEM220_DATDIR/lj-velocity.txt $CHEM220_DATDIR/lj-velocity-
+    
+fi
+
+if [ $1 == "HW6-DATA" ]; then
+    if [ ! -e $CHEM220_IMGDIR/hw6 ]; then
+        mkdir $CHEM220_IMGDIR/hw6
+    fi
+    python script/hw6.py -velfile $CHEM220_DATDIR/lj-velocity.txt #-save $CHEM220_IMGDIR/hw6
+fi

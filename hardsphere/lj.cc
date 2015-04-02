@@ -160,10 +160,8 @@ int main(int argc, char * argv[])
     generate_veldist(velocity, N, T, rng);
     remove_com(velocity, N);
 
-    #ifdef VERBOSE
-    std::cout << "Box size = " << L << ", ljcutoff = " << ljcutoff 
+    std::cerr << "Box size = " << L << ", ljcutoff = " << ljcutoff 
       << ", N = " << N << std::endl;
-    #endif
 
     // Equilibration
     int step = 0;

@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.fft as FFT
+import scipy.signal
 import argparse
 from StringIO import StringIO
 
@@ -10,9 +11,11 @@ def safesaveplot(savedir=None, name=None):
         plt.savefig(savedir+'/'+name)
         plt.clf()
 parser = argparse.ArgumentParser()
-parser.add_argument("-velfile", required=True, help="Path to velocity data")
-parser.add_argument("-xyzfile", required=True, help="Path to xyz data")
+parser.add_argument("-velfile", nargs='+', required=True, help="Path to velocity data")
+parser.add_argument("-xyzfile", nargs='+', required=True, help="Path to xyz data")
 parser.add_argument("-save", help="Path to save images out")
+parser.add_argument("-savename", default="dx", help="Base name for output")
+parser.add_argument("-density", required=True, type=float, help="Density of simulation, in N/V")
 args = parser.parse_args()
 if not args.save is None:
     import matplotlib
@@ -42,43 +45,80 @@ def loadxyz(filename):
     xyz = np.array(xyz)
     return xyz
             
-
-
 def main():
-    L = 6.4633
-    xyz = loadxyz(args.xyzfile)
-    print xyz.shape
-    shift = L/2. - xyz[0,:,:] 
-    xyz = (xyz + shift + L) % L
-    xyz -= L/2.
-    for i in xrange(xyz.shape[1]):
-        plt.plot(xyz[:,i,0])
-        plt.plot(xyz[:,i,1])
-        plt.plot(xyz[:,i,2])
-    safesaveplot(args.save, "x_ensemble.png")
-    
-    plt.plot(xyz[:,0,0])
-    safesaveplot(args.save, "x_particle.png")
-    exit()
+    dt_pos = .1
+    D_xx_set = []
+    for i, xyzfile in enumerate(args.xyzfile):
+        with open(xyzfile) as f:
+            N = int(f.readline())
+        xyz = loadxyz(xyzfile)
+        L = np.power(N / args.density, 1./3.)
+        xyz = loadxyz(xyzfile)
+        shift = L/2. - xyz[0,:,:] 
+        xyz = (xyz + shift + L) % L
+        xyz -= L/2.
+        xyz = xyz.reshape(xyz.shape[0], xyz.shape[1] * 3)
+        xyz_diff = np.diff(xyz, axis=0)
+        xyz_diff[xyz_diff >  L/2.] -= L
+        xyz_diff[xyz_diff < -L/2.] += L
+        xyz = np.cumsum(xyz_diff, axis=0)
+        # plt.plot(xyz)
+        # safesaveplot(args.save, "{}_{}_x_ensemble.png".format(args.savename, i))
+        rmsd = np.std(xyz, axis=1)
+        plt.plot(rmsd)
+        safesaveplot(args.save, "{}_{}_x_rmsd.png".format(args.savename, i))
+        t = np.array(range(1, len(rmsd)+1)) * dt_pos
+        diff = np.square(rmsd) / t / 2.
+        plt.plot(diff)
+        safesaveplot(args.save, "{}_{}_x_diffusion.png".format(args.savename, i))
+        D_xx = np.mean(diff[-10:])
+        D_xx_set.append(D_xx)
+    if len(D_xx_set) > 1:
+        D_xx_set = np.array(D_xx_set)
+        D_xx_est = np.mean(D_xx_set)
+        D_xx_err = np.std(D_xx_set, ddof=1) / np.sqrt(len(D_xx_set))
+        print "D_xx = {} +/- {}".format(D_xx_est, D_xx_err)
+    else:
+        print "D_xx = {}".format(D_xx_set[0])
 
-
-    vel = np.loadtxt(args.velfile)
-    vel = vel.reshape((vel.shape[0], vel.shape[1]/3, 3))
-    print vel
-    plt.plot(vel[:,0,0])
-    safesaveplot(args.save, "v_particle.png")
-    Ct = np.zeros((vel.shape[0]/2))
-    for i in xrange(vel.shape[1]):
-        for j in xrange(vel.shape[2]):
-            f_w = FFT.rfft(vel[:,i,j])
-            mag = f_w * np.conj(f_w)
-            Ct_ij = FFT.irfft(mag)
-            Ct += Ct_ij[:len(Ct_ij)/2] / vel.shape[0] * 2
-    plt.plot(Ct / vel.shape[1] / vel.shape[2])
-    safesaveplot(args.save, "v_autocorr.png")
-
-
-
+    dt_vel = .01
+    D_vv_set = []
+    for fnum, velfile in enumerate(args.velfile):
+        # Velocities are indexed with [T, 3i + dir],
+        #  where i indexes the particle
+        vel = np.loadtxt(velfile, skiprows=1)
+        vel = vel.reshape((vel.shape[0], vel.shape[1]/3, 3))
+        plt.plot(vel[:,0,0])
+        safesaveplot(args.save, "{}_{}_v_particle.png".format(args.savename, fnum))
+        Ct = np.zeros((vel.shape[0] - 1))
+        for i in xrange(vel.shape[1]):
+            for j in xrange(vel.shape[2]):
+                sig = vel[:,i,j]
+                Ct_conv = scipy.signal.fftconvolve(sig, sig[::-1])
+                T = len(Ct_conv) / 2
+                Ct_conv = Ct_conv[T+1:]
+                norms = T - np.array(range( T ))
+                Ct += Ct_conv / norms
+        Ct /= (vel.shape[1] * vel.shape[2])
+        plt.plot(Ct)
+        safesaveplot(args.save, "{}_{}_v_autocov.png".format(args.savename, fnum))
+        plt.hist(vel.flatten(), log=True, bins=100, normed=True)
+        kT = .75
+        prob_curve_x = np.linspace(-5, 5, 100)
+        prob_curve_y = 1. / (np.sqrt(2. * np.pi) * kT) * \
+                    np.exp(-np.square(prob_curve_x)/(2. * kT))
+        plt.plot(prob_curve_x, prob_curve_y, 'ro')
+        safesaveplot(args.save, "{}_{}_v_hist.png".format(args.savename, fnum))
+        tf = 350
+        D_vv = np.sum((Ct[1:tf] + Ct[:tf-1]) / 2.0) * dt_vel
+        D_vv_set.append(D_vv)
+    if len(D_vv_set) > 1:
+        D_vv_set = np.array(D_vv_set)
+        D_vv_est = np.mean(D_vv_set)
+        D_vv_err = np.std(D_vv_set, ddof=1) / np.sqrt(len(D_vv_set))
+        print "D_vv = {} +/- {}".format(D_vv_est, D_vv_err)
+    else:
+        print "D_vv = {}".format(D_vv_set[0])
 
 if __name__ == "__main__":
     main()

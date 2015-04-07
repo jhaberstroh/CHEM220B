@@ -69,7 +69,8 @@ int step_mc_verlet(double* particles, double* velocity, int N,
     {
         if (particles_copy[index] < -L)
         {
-            std::cerr << "Particle far back at " << particles_copy[index] << std::endl;
+            std::cerr << "Particle far back at " << particles_copy[index] 
+              << std::endl;
         }
         if (particles_copy[index] > 2*L)
         {
@@ -129,7 +130,7 @@ int main(int argc, char * argv[])
     int nstxyz = 10;
     double probe_rad = .45;
     int maxfouriernum = 1;
-    double T = 3.0;
+    double T = 1.5;
     int N_linear = 6;
 
     for (int arg_i = 1 ; arg_i < argc ; arg_i++)
@@ -175,13 +176,21 @@ int main(int argc, char * argv[])
         double Utot_out = 0;
         step_mc_verlet(particles, velocity, N, ljdiameter, ljenergy, 
            ljcutoff, dt, L, Utot_out);
+        Utot = Utot_out;
 
         if (step % 50 == 0 && step != 0)
         {
             remove_com(velocity, N);
             thermostat_vrescale(velocity, N, T);
         }
+        double Ktot;
+        Ktot = kinetic_energy(velocity, N);
+        
+        #ifdef ENERGY
+        std::cout << (step-nsteq) * dt << " " << Utot << " " << Ktot << std::endl;
+        #endif //ENERGY
     }
+
 
     // Production
     for (step = 0 ; step < nstmd ; step++)
@@ -199,10 +208,14 @@ int main(int argc, char * argv[])
         Ktot = kinetic_energy(velocity, N);
         
         #ifdef ENERGY
-        std::cout << Utot << " " << Ktot << std::endl;
+        std::cout << step * dt << " " << Utot << " " << Ktot << std::endl;
         #endif //ENERGY
 
         #ifdef VELOCITY
+        if (step == 0)
+        {
+            std::cout << dt << " " << T/ljenergy << std::endl;
+        }
         if (step % 10 == 0 && step != 0)
         {
             for (int index = 0 ; index < N ; index++)

@@ -14,6 +14,8 @@ def safesaveplot(savedir=None, name=None):
 parser = argparse.ArgumentParser()
 parser.add_argument("file", nargs="+", 
         help="Path to csv files used in script")
+parser.add_argument("-N", default=1000, type=int, help="Number of particles")
+parser.add_argument("-T", default=100, type=int, help="Number of frames")
 parser.add_argument("-save", help="Path to save images out")
 args = parser.parse_args()
 if args.save:
@@ -33,10 +35,10 @@ for fname in args.file:
     ind = outname.index("_")
     density = float("." + outname[ind+1:])
     
-    N_frames = 5000/50
+    N_frames = args.T
     # Half particles used becasue factor of 2 for symmetry in distance has
     #  already been accounted for
-    half_particles = 500
+    half_particles = args.N/2
 
     bins = np.linspace(1,5,101)
     N_R, bins = np.histogram(dat[dat != 0], bins=bins)

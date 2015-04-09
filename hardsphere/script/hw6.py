@@ -13,6 +13,7 @@ def safesaveplot(savedir=None, name=None):
 parser = argparse.ArgumentParser()
 parser.add_argument("-velfile", nargs='+', required=True, help="Path to velocity data")
 parser.add_argument("-xyzfile", nargs='+', required=True, help="Path to xyz data")
+parser.add_argument("-enerfile", required=True, help="Path to energy data")
 parser.add_argument("-save", help="Path to save images out")
 parser.add_argument("-savename", default="dx", help="Base name for output")
 parser.add_argument("-density", required=True, type=float, help="Density of simulation, in N/V")
@@ -44,8 +45,8 @@ def loadxyz(filename):
                 data = ""
     xyz = np.array(xyz)
     return xyz
-            
-def main():
+        
+def pos_plot():
     dt_pos = .1
     D_xx_set = []
     for i, xyzfile in enumerate(args.xyzfile):
@@ -62,15 +63,23 @@ def main():
         xyz_diff[xyz_diff >  L/2.] -= L
         xyz_diff[xyz_diff < -L/2.] += L
         xyz = np.cumsum(xyz_diff, axis=0)
-        # plt.plot(xyz)
-        # safesaveplot(args.save, "{}_{}_x_ensemble.png".format(args.savename, i))
+        t = np.array(range(xyz.shape[0])) * dt_pos
+        plt.plot(t, xyz)
+        plt.title("Ensemble for rho={}".format(args.density))
+        plt.xlabel("Time, tau")
+        safesaveplot(args.save, "{}_{}_x_ensemble.png".format(args.savename, i))
+
         rmsd = np.std(xyz, axis=1)
-        plt.plot(rmsd)
-        safesaveplot(args.save, "{}_{}_x_rmsd.png".format(args.savename, i))
         t = np.array(range(1, len(rmsd)+1)) * dt_pos
+        plt.plot(t, rmsd)
+        plt.title("Dynamical RMSD, rho={}".format(args.density))
+        plt.xlabel("Time, tau")
+        safesaveplot(args.save, "{}_{}_x_rmsd.png".format(args.savename, i))
+
         diff = np.square(rmsd) / t / 2.
-        plt.plot(diff)
+        plt.plot(t, diff)
         safesaveplot(args.save, "{}_{}_x_diffusion.png".format(args.savename, i))
+
         D_xx = np.mean(diff[-10:])
         D_xx_set.append(D_xx)
     if len(D_xx_set) > 1:
@@ -81,6 +90,7 @@ def main():
     else:
         print "D_xx = {}".format(D_xx_set[0])
 
+def vel_plot():
     dt_vel = .01
     D_vv_set = []
     for fnum, velfile in enumerate(args.velfile):
@@ -88,9 +98,12 @@ def main():
         #  where i indexes the particle
         vel = np.loadtxt(velfile, skiprows=1)
         vel = vel.reshape((vel.shape[0], vel.shape[1]/3, 3))
-        plt.plot(vel[:,0,0])
+        t = np.array(range(vel.shape[0])) * dt_vel
+        plt.plot(t, vel[:,0,0])
         safesaveplot(args.save, "{}_{}_v_particle.png".format(args.savename, fnum))
+
         Ct = np.zeros((vel.shape[0] - 1))
+        t = np.array(range(len(Ct))) * dt_vel
         for i in xrange(vel.shape[1]):
             for j in xrange(vel.shape[2]):
                 sig = vel[:,i,j]
@@ -100,15 +113,23 @@ def main():
                 norms = T - np.array(range( T ))
                 Ct += Ct_conv / norms
         Ct /= (vel.shape[1] * vel.shape[2])
-        plt.plot(Ct)
+        plt.plot(t, Ct)
+        plt.title("Velocity Autocovariance, rho={}".format(args.density))
+        plt.xlabel("Time, tau")
         safesaveplot(args.save, "{}_{}_v_autocov.png".format(args.savename, fnum))
+        
         plt.hist(vel.flatten(), log=True, bins=100, normed=True)
-        kT = .75
+        kT = 1.5
+        sig = kT / 2.
         prob_curve_x = np.linspace(-5, 5, 100)
-        prob_curve_y = 1. / (np.sqrt(2. * np.pi) * kT) * \
-                    np.exp(-np.square(prob_curve_x)/(2. * kT))
-        plt.plot(prob_curve_x, prob_curve_y, 'ro')
+        prob_curve_y = 1. / (np.sqrt(2. * np.pi) * sig) * \
+                    np.exp(-np.square(prob_curve_x)/(2. * sig))
+        plt.plot(prob_curve_x, prob_curve_y, 'r--')
+        plt.title("Velocity distribution, one component, rho={}".format(args.density))
+        plt.xlabel("Velocity, sigma/tau")
+        plt.ylabel("Probability")
         safesaveplot(args.save, "{}_{}_v_hist.png".format(args.savename, fnum))
+
         tf = 350
         D_vv = np.sum((Ct[1:tf] + Ct[:tf-1]) / 2.0) * dt_vel
         D_vv_set.append(D_vv)
@@ -120,5 +141,15 @@ def main():
     else:
         print "D_vv = {}".format(D_vv_set[0])
 
+def ener_plot():
+    E_t = np.loadtxt(args.enerfile)
+    plt.plot(E_t[:,0], E_t[:,1])
+    plt.plot(E_t[:,0], E_t[:,2])
+    plt.legend(("Kinetic Energy", "Potential Energy"))
+    plt.xlabel("Time, Tau")
+    plt.title("Energy dynamics for rho={}".format(args.density))
+
 if __name__ == "__main__":
-    main()
+    pos_plot()
+    vel_plot()
+    ener_plot()

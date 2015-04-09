@@ -166,27 +166,27 @@ if [ $1 == "HW6-DATA" ]; then
     if [ ! -e $CHEM220_IMGDIR/hw6/check ]; then
         mkdir $CHEM220_IMGDIR/hw6/check
     fi
-    # echo "Running analysis for density=.3..."
-    # python script/hw6.py -density .3 \
-    #     -velfile $CHEM220_DATDIR/lj_{1..3}-v3.txt \
-    #     -xyzfile $CHEM220_DATDIR/lj_{1..3}-x3.xyz \
-    #     -savename d3 -save $CHEM220_IMGDIR/hw6/check \
-    #     > $CHEM220_IMGDIR/hw6/d3_diff.txt
-    # echo "Running analysis for density=.6..."
-    # python script/hw6.py -density .6 \
-    #     -velfile $CHEM220_DATDIR/lj_{1..3}-v6.txt \
-    #     -xyzfile $CHEM220_DATDIR/lj_{1..3}-x6.xyz \
-    #     -savename d6 -save $CHEM220_IMGDIR/hw6/check \
-    #     > $CHEM220_IMGDIR/hw6/d6_diff.txt
-    # echo "Running analysis for density=.8..."
-    # python script/hw6.py -density .8 \
-    #     -velfile $CHEM220_DATDIR/lj_{1..3}-v8.txt \
-    #     -xyzfile $CHEM220_DATDIR/lj_{1..3}-x8.xyz \
-    #     -savename d8 -save $CHEM220_IMGDIR/hw6/check \
-    #     > $CHEM220_IMGDIR/hw6/d8_diff.txt
-    # python script/gr.py $CHEM220_DATDIR/lj-gr_*.csv -save $CHEM220_IMGDIR/hw6 \
-    #     -N 1000 -T 60
-    xmgrace -nxy data/lj-e3.txt -printfile $CHEM220_IMGDIR/hw6/lj-energy3.png -hardcopy -hdevice PNG
-    xmgrace -nxy data/lj-e6.txt -printfile $CHEM220_IMGDIR/hw6/lj-energy6.png -hardcopy -hdevice PNG
-    xmgrace -nxy data/lj-e8.txt -printfile $CHEM220_IMGDIR/hw6/lj-energy8.png -hardcopy -hdevice PNG
+    echo "Running analysis for density=.3..."
+    python script/hw6.py -density .3 \
+        -velfile $CHEM220_DATDIR/lj_{1..3}-v3.txt \
+        -xyzfile $CHEM220_DATDIR/lj_{1..3}-x3.xyz \
+        -enerfile $CHEM220_DATDIR/lj-e3.txt \
+        -savename d3 -save $CHEM220_IMGDIR/hw6/check \
+        > $CHEM220_IMGDIR/hw6/d3_diff.txt
+    echo "Running analysis for density=.6..."
+    python script/hw6.py -density .6 \
+        -velfile $CHEM220_DATDIR/lj_{1..3}-v6.txt \
+        -xyzfile $CHEM220_DATDIR/lj_{1..3}-x6.xyz \
+        -enerfile $CHEM220_DATDIR/lj-e6.txt \
+        -savename d6 -save $CHEM220_IMGDIR/hw6/check \
+        > $CHEM220_IMGDIR/hw6/d6_diff.txt
+    echo "Running analysis for density=.8..."
+    python script/hw6.py -density .8 \
+        -velfile $CHEM220_DATDIR/lj_{1..3}-v8.txt \
+        -xyzfile $CHEM220_DATDIR/lj_{1..3}-x8.xyz \
+        -enerfile $CHEM220_DATDIR/lj-e8.txt \
+        -savename d8 -save $CHEM220_IMGDIR/hw6/check \
+        > $CHEM220_IMGDIR/hw6/d8_diff.txt
+    python script/gr.py $CHEM220_DATDIR/lj-gr_*.csv -save $CHEM220_IMGDIR/hw6 \
+        -N 1000 -T 60
 fi

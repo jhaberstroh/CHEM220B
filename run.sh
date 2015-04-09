@@ -4,14 +4,14 @@ set -o errexit
 set -o nounset
 
 if [ -z ${CHEM220_IMGDIR+x} ]; then
-    CHEM220_IMGDIR=images
+    CHEM220_IMGDIR=$(pwd)/images
 fi
 if [ ! -e $CHEM220_IMGDIR ]; then
     mkdir $CHEM220_IMGDIR
 fi
 
 if [ -z ${CHEM220_DATDIR+x} ]; then
-    CHEM220_DATDIR=data
+    CHEM220_DATDIR=$(pwd)/data
 fi
 if [ ! -e $CHEM220_DATDIR ]; then
     mkdir $CHEM220_DATDIR
@@ -23,12 +23,14 @@ if [ -z ${1+x} ]; then
 fi
 
 if [ $1 == "TEST-MC" ]; then
+    cd hardsphere
     gcc hardsphere.cc -lstdc++ -o hardsphere-test -DVERBOSE -DXYZOUT -DACCEPTANCE
     ./hardsphere-test -h
     ./hardsphere-test -nsteq 100 -nstmc 100 -step_size .7
 fi
 
 if [ $1 == "TEST-LJ" ]; then
+    cd hardsphere
     gcc lj.cc -lstdc++ -o lj-test -DXYZOUT
     ./lj-test -nsteq 1000 -nstmc 100 -nstxyz 10 > $CHEM220_DATDIR/lj.xyz
     # vmd $CHEM220_DATDIR/lj.xyz
@@ -38,6 +40,7 @@ fi
 # HW 1
 # =============================================================================
 if [ $1 == "HW1-SIM" ]; then
+    cd hardsphere
     echo "Submitted one hardsphere-xyz, one hardsphere-sol and three" \
    " hardsphere-lg tasks"
     gcc hardsphere.cc -lstdc++ -o hardsphere-xyz -DXYZOUT
@@ -53,6 +56,7 @@ if [ $1 == "HW1-SIM" ]; then
 fi
 
 if [ $1 == "HW1-DATA" ]; then
+    cd hardsphere
     echo "Saving images to $CHEM220_IMGDIR/hw1"
     if [ ! -e $CHEM220_IMGDIR/hw1 ]; then
         mkdir $CHEM220_IMGDIR/hw1
@@ -65,6 +69,7 @@ fi
 # HW 2
 # =============================================================================
 if [ $1 == "HW2-SIM" ]; then
+    cd hardsphere
     echo "Submitted one hardsphere-fourier task"
     gcc hardsphere.cc -lstdc++ -o hardsphere-fourier -DFOURIER
     ./hardsphere-fourier -nsteq 500 -nstmc 10000 -nstfourier 10 -step_size .7 \
@@ -72,6 +77,7 @@ if [ $1 == "HW2-SIM" ]; then
 fi
 
 if [ $1 == "HW2-DATA" ]; then
+    cd hardsphere
     echo "Saving images to $CHEM220_IMGDIR/hw2"
     if [ ! -e $CHEM220_IMGDIR/hw2 ]; then
         mkdir $CHEM220_IMGDIR/hw2
@@ -83,6 +89,7 @@ fi
 # HW 3
 # =============================================================================
 if [ $1 == "HW3-SIM" ]; then
+    cd hardsphere
     nstmc=5000
     DATA_MB=$(echo "(1000 * 1000 / 2) * ($nstmc / 50) * 10 * 2.3 / 1024 / 1024" | bc)
     echo "This run will generate something like $DATA_MB MB of data"
@@ -108,17 +115,40 @@ if [ $1 == "HW3-SIM" ]; then
 fi
 
 if [ $1 == "HW3-DATA" ]; then
+    cd hardsphere
     if [ ! -e $CHEM220_IMGDIR/hw3 ]; then
         mkdir $CHEM220_IMGDIR/hw3
     fi
     python script/gr.py $CHEM220_DATDIR/gr_*.csv -save $CHEM220_IMGDIR/hw3
 fi
 
+# =============================================================================
+# HW 4
+# =============================================================================
+if [ $1 == "HW4-DATA" ]; then
+    cd numerics
+    if [ ! -e $CHEM220_IMGDIR/hw4 ]; then
+        mkdir $CHEM220_IMGDIR/hw4
+    fi
+    python hw4.py -save $CHEM220_IMGDIR/hw4 -gaw -dmu -gaa > $CHEM220_IMGDIR/hw4/coeff.txt
+fi
+
+# =============================================================================
+# HW 5
+# =============================================================================
+if [ $1 == "HW4-DATA" ]; then
+    cd numerics
+    if [ ! -e $CHEM220_IMGDIR/hw5 ]; then
+        mkdir $CHEM220_IMGDIR/hw5
+    fi
+    python hw5.py -save $CHEM220_IMGDIR/hw5
+fi
 
 # =============================================================================
 # HW 6
 # =============================================================================
 if [ $1 == "HW6-SIM" ]; then
+    cd hardsphere
     gcc lj.cc -lstdc++ -o lj-energy -DENERGY
     gcc lj.cc -lstdc++ -o lj-velocity -DVELOCITY
     gcc lj.cc -lstdc++ -o lj-xyz -DXYZOUT
@@ -160,6 +190,7 @@ if [ $1 == "HW6-SIM" ]; then
 fi
 
 if [ $1 == "HW6-DATA" ]; then
+    cd hardsphere
     if [ ! -e $CHEM220_IMGDIR/hw6 ]; then
         mkdir $CHEM220_IMGDIR/hw6
     fi

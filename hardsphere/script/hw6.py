@@ -3,6 +3,18 @@ import numpy.fft as FFT
 import scipy.signal
 import argparse
 from StringIO import StringIO
+parser = argparse.ArgumentParser()
+parser.add_argument("-velfile", nargs='+', required=True, help="Path to velocity data")
+parser.add_argument("-xyzfile", nargs='+', required=True, help="Path to xyz data")
+parser.add_argument("-enerfile", required=True, help="Path to energy data")
+parser.add_argument("-save", help="Path to save images out")
+parser.add_argument("-savename", default="dx", help="Base name for output")
+parser.add_argument("-density", required=True, type=float, help="Density of simulation, in N/V")
+args = parser.parse_args() 
+if not args.save is None:
+    import matplotlib
+    matplotlib.use("agg")
+import matplotlib.pyplot as plt
 
 def safesaveplot(savedir=None, name=None):
     plt.tight_layout()
@@ -11,22 +23,10 @@ def safesaveplot(savedir=None, name=None):
     else:
         plt.savefig(savedir+'/'+name)
         plt.clf()
-parser = argparse.ArgumentParser()
-parser.add_argument("-velfile", nargs='+', required=True, help="Path to velocity data")
-parser.add_argument("-xyzfile", nargs='+', required=True, help="Path to xyz data")
-parser.add_argument("-enerfile", required=True, help="Path to energy data")
-parser.add_argument("-save", help="Path to save images out")
-parser.add_argument("-savename", default="dx", help="Base name for output")
-parser.add_argument("-density", required=True, type=float, help="Density of simulation, in N/V")
-args = parser.parse_args()
-if not args.save is None:
-    import matplotlib
-    matplotlib.use("agg")
-import matplotlib.pyplot as plt
 
-
-def loadxyz(filename):
+def loadxyz(filename, return_comments=False):
     xyz = []
+    comments = []
     with open(filename) as f:
         i = 0
         data = ""
@@ -34,7 +34,7 @@ def loadxyz(filename):
             if i==0:
                 n_particle = int(l)
             elif i==1:
-                comment = l
+                comments.append(l)
             else:
                 data = data + l
             i+=1
@@ -45,10 +45,13 @@ def loadxyz(filename):
                 xyz.append(frame)
                 data = ""
     xyz = np.array(xyz)
+    if return_comments:
+        return xyz, comments
     return xyz
         
-def pos_plot():
+def pos_plot(args):
     dt_pos = .1
+    MSD_set = []
     D_xx_set = []
     Dt_set = []
     for i, xyzfile in enumerate(args.xyzfile):
@@ -73,10 +76,11 @@ def pos_plot():
 
         rmsd = np.std(xyz, axis=1)
         t = np.array(range(1, len(rmsd)+1)) * dt_pos
-        plt.plot(t, rmsd)
+        plt.plot(t, np.square(rmsd))
         plt.title("Dynamical RMSD, rho={}".format(args.density))
         plt.xlabel("Time, tau")
-        safesaveplot(args.save, "{}_{}_x_rmsd.png".format(args.savename, i))
+        safesaveplot(args.save, "{}_{}_x_msd.png".format(args.savename, i))
+        MSD_set.append(np.square(rmsd))
 
         diff = np.square(rmsd) / t / 2.
         Dt_set.append(diff)
@@ -93,6 +97,14 @@ def pos_plot():
         plt.xlabel("time, tau")
         plt.ylabel("Diffusion, sigma^2 / tau")
         safesaveplot(args.save, "{}_x_Dt.png".format(args.savename))
+
+        MSD_set = np.array(MSD_set).T
+        plt.plot(t, MSD_set)
+        plt.title("Mean Square Disp, rho={}".format(args.density))
+        plt.xlabel("time, tau")
+        plt.ylabel("MSD, sigma^2")
+        safesaveplot(args.save, "{}_x_MSD.png".format(args.savename))
+
         D_xx_set = np.array(D_xx_set)
         D_xx_est = np.mean(D_xx_set)
         D_xx_err = np.std(D_xx_set, ddof=1) / np.sqrt(len(D_xx_set))
@@ -100,7 +112,7 @@ def pos_plot():
     else:
         print "D_xx = {}".format(D_xx_set[0])
 
-def vel_plot():
+def vel_plot(args):
     dt_vel = .01
     D_vv_set = []
     Ct_set = []
@@ -160,7 +172,7 @@ def vel_plot():
     else:
         print "D_vv = {}".format(D_vv_set[0])
 
-def ener_plot():
+def ener_plot(args):
     E_t = np.loadtxt(args.enerfile)
     plt.plot(E_t[:,0], E_t[:,1])
     plt.plot(E_t[:,0], E_t[:,2])
@@ -173,8 +185,8 @@ def ener_plot():
 if __name__ == "__main__":
     fig=plt.gcf()
     fig.set_size_inches(7.0,3.0)
-    ener_plot()
+    ener_plot(args)
     fig=plt.gcf()
     fig.set_size_inches(4.0,3.0)
-    pos_plot()
-    vel_plot()
+    pos_plot(args)
+    vel_plot(args)

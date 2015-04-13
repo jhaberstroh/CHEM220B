@@ -16,7 +16,7 @@ int thermostat_vrescale(double* velocity, int N, double T)
     }
     else
     {
-        rescale = sqrt(3. / 2. * T * (N-1) ) / sqrt(vtot_sq);
+        rescale = sqrt(3. * T * (N-1) ) / sqrt(vtot_sq);
         std::cerr << "Rescale factor: " << rescale << std::endl;
     }
     for (int index = 0 ; index < 3 * N ; index++)

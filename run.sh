@@ -157,34 +157,34 @@ if [ $1 == "HW6-SIM" ]; then
     echo "If fewer than 8 cores, expect significantly slower runtime."
     echo "Running energy simulations..."
     echo "Running density=.3 simulations..."
-    ./lj-energy   -N_linear 10 -density .3             -nsteq 20000 -nstmd  5000 > $CHEM220_DATDIR/lj-e3.txt &
-    ./lj-gr       -N_linear 10 -density .3             -nsteq 20000 -nstmd  3000 > $CHEM220_DATDIR/lj-gr_3.csv &
-    ./lj-velocity -N_linear 10 -density .3 -seed 90210 -nsteq 20000 -nstmd  5000 > $CHEM220_DATDIR/lj_1-v3.txt &
-    ./lj-velocity -N_linear 10 -density .3 -seed 90211 -nsteq 20000 -nstmd  5000 > $CHEM220_DATDIR/lj_2-v3.txt &
-    ./lj-velocity -N_linear 10 -density .3 -seed 90212 -nsteq 20000 -nstmd  5000 > $CHEM220_DATDIR/lj_3-v3.txt &
-    ./lj-xyz      -N_linear 10 -density .3 -seed 90210 -nsteq 20000 -nstmd 10000 -nstxyz 100 > $CHEM220_DATDIR/lj_1-x3.xyz   &
-    ./lj-xyz      -N_linear 10 -density .3 -seed 90211 -nsteq 20000 -nstmd 10000 -nstxyz 100 > $CHEM220_DATDIR/lj_2-x3.xyz   &
-    ./lj-xyz      -N_linear 10 -density .3 -seed 90212 -nsteq 20000 -nstmd 10000 -nstxyz 100 > $CHEM220_DATDIR/lj_3-x3.xyz   
+    ./lj-energy   -N_linear 10 -density .3             -nsteq 1000 -nstmd 5000 > $CHEM220_DATDIR/lj-e3.txt &
+    ./lj-gr       -N_linear 10 -density .3             -nsteq 1000 -nstmd 3000 > $CHEM220_DATDIR/lj-gr_3.csv &
+    ./lj-velocity -N_linear 10 -density .3 -seed 90210 -nsteq 1000 -nstmd 5000 > $CHEM220_DATDIR/lj_1-v3.txt &
+    ./lj-velocity -N_linear 10 -density .3 -seed 90211 -nsteq 1000 -nstmd 5000 > $CHEM220_DATDIR/lj_2-v3.txt &
+    ./lj-velocity -N_linear 10 -density .3 -seed 90212 -nsteq 1000 -nstmd 5000 > $CHEM220_DATDIR/lj_3-v3.txt &
+    ./lj-xyz      -N_linear 10 -density .3 -seed 90210 -nsteq 1000 -nstmd 5000 -nstxyz 100 > $CHEM220_DATDIR/lj_1-x3.xyz   &
+    ./lj-xyz      -N_linear 10 -density .3 -seed 90211 -nsteq 1000 -nstmd 5000 -nstxyz 100 > $CHEM220_DATDIR/lj_2-x3.xyz   &
+    ./lj-xyz      -N_linear 10 -density .3 -seed 90212 -nsteq 1000 -nstmd 5000 -nstxyz 100 > $CHEM220_DATDIR/lj_3-x3.xyz   
 
     echo "Running density=.6 simulations..."
-    ./lj-energy   -N_linear 10 -density .6             -nsteq  5000 -nstmd  5000 > $CHEM220_DATDIR/lj-e6.txt &
-    ./lj-gr       -N_linear 10 -density .6             -nsteq  5000 -nstmd  3000 > $CHEM220_DATDIR/lj-gr_6.csv &
-    ./lj-velocity -N_linear 10 -density .6 -seed 90210 -nsteq  5000 -nstmd  5000 > $CHEM220_DATDIR/lj_1-v6.txt &
-    ./lj-velocity -N_linear 10 -density .6 -seed 90211 -nsteq  5000 -nstmd  5000 > $CHEM220_DATDIR/lj_2-v6.txt &
-    ./lj-velocity -N_linear 10 -density .6 -seed 90212 -nsteq  5000 -nstmd  5000 > $CHEM220_DATDIR/lj_3-v6.txt &
-    ./lj-xyz      -N_linear 10 -density .6 -seed 90214 -nsteq  5000 -nstmd 10000 -nstxyz 100 > $CHEM220_DATDIR/lj_1-x6.xyz   &
-    ./lj-xyz      -N_linear 10 -density .6 -seed 90215 -nsteq  5000 -nstmd 10000 -nstxyz 100 > $CHEM220_DATDIR/lj_2-x6.xyz   &
-    ./lj-xyz      -N_linear 10 -density .6 -seed 90216 -nsteq  5000 -nstmd 10000 -nstxyz 100 > $CHEM220_DATDIR/lj_3-x6.xyz
+    ./lj-energy   -N_linear 10 -density .6             -nsteq 1000 -nstmd 5000 > $CHEM220_DATDIR/lj-e6.txt &
+    ./lj-gr       -N_linear 10 -density .6             -nsteq 1000 -nstmd 3000 > $CHEM220_DATDIR/lj-gr_6.csv &
+    ./lj-velocity -N_linear 10 -density .6 -seed 90210 -nsteq 1000 -nstmd 5000 > $CHEM220_DATDIR/lj_1-v6.txt &
+    ./lj-velocity -N_linear 10 -density .6 -seed 90211 -nsteq 1000 -nstmd 5000 > $CHEM220_DATDIR/lj_2-v6.txt &
+    ./lj-velocity -N_linear 10 -density .6 -seed 90212 -nsteq 1000 -nstmd 5000 > $CHEM220_DATDIR/lj_3-v6.txt &
+    ./lj-xyz      -N_linear 10 -density .6 -seed 90214 -nsteq 1000 -nstmd 5000 -nstxyz 100 > $CHEM220_DATDIR/lj_1-x6.xyz   &
+    ./lj-xyz      -N_linear 10 -density .6 -seed 90215 -nsteq 1000 -nstmd 5000 -nstxyz 100 > $CHEM220_DATDIR/lj_2-x6.xyz   &
+    ./lj-xyz      -N_linear 10 -density .6 -seed 90216 -nsteq 1000 -nstmd 5000 -nstxyz 100 > $CHEM220_DATDIR/lj_3-x6.xyz
     
     echo "Running density=.8 simulations"
-    ./lj-energy   -N_linear 10 -density .8             -nsteq  1000 -nstmd  5000 > $CHEM220_DATDIR/lj-e8.txt &
-    ./lj-gr       -N_linear 10 -density .8             -nsteq  1000 -nstmd  3000 > $CHEM220_DATDIR/lj-gr_8.csv     &
-    ./lj-velocity -N_linear 10 -density .8 -seed 90210 -nsteq  1000 -nstmd  5000 > $CHEM220_DATDIR/lj_1-v8.txt &
-    ./lj-velocity -N_linear 10 -density .8 -seed 90211 -nsteq  1000 -nstmd  5000 > $CHEM220_DATDIR/lj_2-v8.txt &
-    ./lj-velocity -N_linear 10 -density .8 -seed 90212 -nsteq  1000 -nstmd  5000 > $CHEM220_DATDIR/lj_3-v8.txt &
-    ./lj-xyz      -N_linear 10 -density .8 -seed 90210 -nsteq  1000 -nstmd  5000 -nstxyz 100 > $CHEM220_DATDIR/lj_1-x8.xyz   &
-    ./lj-xyz      -N_linear 10 -density .8 -seed 90211 -nsteq  1000 -nstmd  5000 -nstxyz 100 > $CHEM220_DATDIR/lj_2-x8.xyz   &
-    ./lj-xyz      -N_linear 10 -density .8 -seed 90212 -nsteq  1000 -nstmd  5000 -nstxyz 100 > $CHEM220_DATDIR/lj_3-x8.xyz   
+    ./lj-energy   -N_linear 10 -density .8             -nsteq 1000 -nstmd 5000 > $CHEM220_DATDIR/lj-e8.txt &
+    ./lj-gr       -N_linear 10 -density .8             -nsteq 1000 -nstmd 3000 > $CHEM220_DATDIR/lj-gr_8.csv     &
+    ./lj-velocity -N_linear 10 -density .8 -seed 90210 -nsteq 1000 -nstmd 5000 > $CHEM220_DATDIR/lj_1-v8.txt &
+    ./lj-velocity -N_linear 10 -density .8 -seed 90211 -nsteq 1000 -nstmd 5000 > $CHEM220_DATDIR/lj_2-v8.txt &
+    ./lj-velocity -N_linear 10 -density .8 -seed 90212 -nsteq 1000 -nstmd 5000 > $CHEM220_DATDIR/lj_3-v8.txt &
+    ./lj-xyz      -N_linear 10 -density .8 -seed 90210 -nsteq 1000 -nstmd 5000 -nstxyz 100 > $CHEM220_DATDIR/lj_1-x8.xyz   &
+    ./lj-xyz      -N_linear 10 -density .8 -seed 90211 -nsteq 1000 -nstmd 5000 -nstxyz 100 > $CHEM220_DATDIR/lj_2-x8.xyz   &
+    ./lj-xyz      -N_linear 10 -density .8 -seed 90212 -nsteq 1000 -nstmd 5000 -nstxyz 100 > $CHEM220_DATDIR/lj_3-x8.xyz   
 
     rm lj-gr lj-velocity lj-energy lj-xyz
 fi
@@ -220,4 +220,27 @@ if [ $1 == "HW6-DATA" ]; then
         > $CHEM220_IMGDIR/hw6/d8_diff.txt
     python script/gr.py $CHEM220_DATDIR/lj-gr_*.csv -save $CHEM220_IMGDIR/hw6 \
         -N 1000 -T 60
+fi
+
+
+# =============================================================================
+# HW 7
+# =============================================================================
+
+if [ $1 == "HW7-SIM" ]; then
+
+    python pymd/ljmd.py -density .8 -N_linear 5 -field 12 .2 -nsteq 1000 \
+        -nstxyz 1 -nstmd 500 \
+        -posfile $CHEM220_DATDIR/field_12.xyz -enerfile $CHEM220_DATDIR/field_12.ener &
+    python pymd/ljmd.py -density .8 -N_linear 5 -field 24 .2 -nsteq 1000 \
+        -nstxyz 1 -nstmd 500 \
+        -posfile $CHEM220_DATDIR/field_24.xyz -enerfile $CHEM220_DATDIR/field_24.ener &
+    python pymd/ljmd.py -density .8 -N_linear 5 -field 36 .2 -nsteq 1000 \
+        -nstxyz 1 -nstmd 500 \
+        -posfile $CHEM220_DATDIR/field_36.xyz -enerfile $CHEM220_DATDIR/field_36.ener
+fi
+if [ $1 == "HW7-DATA" ]; then
+    python hardsphere/script/St.py $CHEM220_DATDIR/field_12.xyz \
+        -save $CHEM220_IMGDIR
+
 fi

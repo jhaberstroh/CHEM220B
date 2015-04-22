@@ -151,8 +151,8 @@ def main():
         particles  += velocities * dt
         pbc(particles, L)
         F_ir, U = ljforces(particles, L)
-        F_ir[:, 0] += f_field * np.sin(k_field * particles[:, 0]) * k_field / np.sqrt(N)
-        U += np.sum(f_field * np.cos(k_field * particles[:, 0])) / np.sqrt(N)
+        F_ir[:, 0] -= f_field * k_field * np.sin(k_field * particles[:, 0])  / np.sqrt(N)
+        U          -= f_field *  np.sum ( np.cos(k_field * particles[:, 0])) / np.sqrt(N)
         velocities += F_ir * dt/2
 
         U_t[step % nstener] = U

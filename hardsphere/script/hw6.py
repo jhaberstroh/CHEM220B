@@ -108,7 +108,7 @@ def pos_plot(args):
         D_xx_set = np.array(D_xx_set)
         D_xx_est = np.mean(D_xx_set)
         D_xx_err = np.std(D_xx_set, ddof=1) / np.sqrt(len(D_xx_set))
-        print "D_xx = {} +/- {}".format(D_xx_est, D_xx_err)
+        print "D_xx = {:.3f} +/- {:.3f}".format(D_xx_est, D_xx_err)
     else:
         print "D_xx = {}".format(D_xx_set[0])
 
@@ -144,7 +144,7 @@ def vel_plot(args):
         
         plt.hist(vel.flatten(), log=True, bins=100, normed=True)
         kT = 1.5
-        sig = kT / 2.
+        sig = kT
         prob_curve_x = np.linspace(-5, 5, 100)
         prob_curve_y = 1. / (np.sqrt(2. * np.pi) * sig) * \
                     np.exp(-np.square(prob_curve_x)/(2. * sig))
@@ -168,7 +168,7 @@ def vel_plot(args):
         D_vv_set = np.array(D_vv_set)
         D_vv_est = np.mean(D_vv_set)
         D_vv_err = np.std(D_vv_set, ddof=1) / np.sqrt(len(D_vv_set))
-        print "D_vv = {} +/- {}".format(D_vv_est, D_vv_err)
+        print "D_vv = {:.3f} +/- {:.3f}".format(D_vv_est, D_vv_err)
     else:
         print "D_vv = {}".format(D_vv_set[0])
 

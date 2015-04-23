@@ -252,10 +252,11 @@ if [ $1 == "HW7-DATA" ]; then
     if [ ! -e "$CHEM220_IMGDIR/hw7" ]; then
         mkdir $CHEM220_IMGDIR/hw7
     fi
-    python hardsphere/script/St.py -savedir $CHEM220_IMGDIR/hw7 -savename St \
-        -eqfile $CHEM220_DATDIR/field_eq*.xyz
-    for str in 3 5 10; do
-        python hardsphere/script/St.py -savedir $CHEM220_IMGDIR/hw7 -savename Xt_$str \
-            $CHEM220_DATDIR/field_*_"$str"_{2..200}.xyz -invscale $(echo "$str / 1.5" | bc)
-    done
+    # python hardsphere/script/St.py -savedir $CHEM220_IMGDIR/hw7 -savename St \
+    #     -eqfile $CHEM220_DATDIR/field_eq*.xyz
+    # for str in 3 5 10; do
+    #     python hardsphere/script/St.py -savedir $CHEM220_IMGDIR/hw7 -savename Xt_$str \
+    #         $CHEM220_DATDIR/field_*_"$str"_{1..200}.xyz -invscale $(echo "$str * .6666667" | bc)
+    # done
+    python numerics/hw7.py -save $CHEM220_IMGDIR/hw7
 fi

@@ -260,3 +260,75 @@ if [ $1 == "HW7-DATA" ]; then
     done
     python numerics/hw7.py -save $CHEM220_IMGDIR/hw7
 fi
+
+
+
+# =============================================================================
+# HW 7
+# =============================================================================
+
+if [ $1 == "HW8-SIM" ]; then
+    cd langevin
+    # gcc langevin.cc -lstdc++ -o langevin
+    # ./langevin > $CHEM220_DATDIR/langevin.txt
+    gcc langevin.cc -DSPLITTING_RATE -lstdc++ -o langevin-split
+
+    kT=1
+    echo "Performing Noise-synchronized rate calculation"
+    for q0 in {00..99}; do
+        echo -en "\rrunning q0 = 0.$q0"
+        ./langevin-split -kT_split .$kT -q0  0.$q0 -seed 0 > $CHEM220_DATDIR/rate_BAD_p$q0.txt
+        ./langevin-split -kT_split .$kT -q0 -0.$q0 -seed 0 > $CHEM220_DATDIR/rate_BAD_m$q0.txt
+        for seed in {1..100}; do
+            ./langevin-split -kT_split .$kT -q0  0.$q0 -seed $seed >> $CHEM220_DATDIR/rate_BAD_p$q0.txt
+            ./langevin-split -kT_split .$kT -q0 -0.$q0 -seed $seed >> $CHEM220_DATDIR/rate_BAD_m$q0.txt
+        done
+    done
+    echo 
+
+    for kT in 1 2 4; do
+        echo "Performing uncorrelated rate calculations, kT=.$kT"
+        for q0 in {00..50}; do
+            echo -en "\rrunning q0 = 0.$q0"
+            ./langevin-split -kT_split .$kT -q0  0.$q0 -seed $q0 > $CHEM220_DATDIR/rate_p$q0-kT$kT.txt
+            ./langevin-split -kT_split .$kT -q0 -0.$q0 -seed $q0 > $CHEM220_DATDIR/rate_m$q0-kT$kT.txt
+            for seed in {1..200}; do
+                ./langevin-split -kT_split .$kT -q0  0.$q0 -seed $seed$q0 >> $CHEM220_DATDIR/rate_p$q0-kT$kT.txt
+                ./langevin-split -kT_split .$kT -q0 -0.$q0 -seed $seed$q0 >> $CHEM220_DATDIR/rate_m$q0-kT$kT.txt
+            done
+        done
+        for q0 in {51..99}; do
+            echo -en "\rrunning q0 = 0.$q0"
+            ./langevin-split -kT_split .$kT -q0  0.$q0 -seed $q0 > $CHEM220_DATDIR/rate_p$q0-kT$kT.txt
+            ./langevin-split -kT_split .$kT -q0 -0.$q0 -seed $q0 > $CHEM220_DATDIR/rate_m$q0-kT$kT.txt
+            for seed in {1..100}; do
+                ./langevin-split -kT_split .$kT -q0  0.$q0 -seed $seed$q0 >> $CHEM220_DATDIR/rate_p$q0-kT$kT.txt
+                ./langevin-split -kT_split .$kT -q0 -0.$q0 -seed $seed$q0 >> $CHEM220_DATDIR/rate_m$q0-kT$kT.txt
+            done
+        done
+        echo
+    done
+fi
+
+if [ $1 == "HW8-DATA" ]; then
+    cd langevin
+    if [ ! -e "$CHEM220_IMGDIR/hw8" ]; then
+        mkdir $CHEM220_IMGDIR/hw8
+    fi
+    DD=$CHEM220_DATDIR
+    python plot.py -save $CHEM220_IMGDIR/hw8 -load $CHEM220_DATDIR/langevin.txt
+    python splitting_double.py -save $CHEM220_IMGDIR/hw8  \
+         -traj $DD/rate_m{99..51}.txt $DD/rate_m{500..001}.txt $DD/rate_p{000..500}.txt $DD/rate_p{51..99}.txt \
+         -traj_q0     -0.{99..51}            -0.{500..001}             0.{000..500}             0.{51..99}
+    for kT in 1 2 4; do
+        python splitting_double.py -save $CHEM220_IMGDIR/hw8 -harmonic -kT .$kT
+        python splitting_double.py -save $CHEM220_IMGDIR/hw8  -kT .$kT \
+            -traj $DD/rate_m{99..01}-kT$kT.txt $DD/rate_p{00..99}-kT$kT.txt \
+            -traj_q0     -0.{99..01}                 0.{00..99}
+    done
+    python splitting_double.py -save $CHEM220_IMGDIR/hw8  -kT .1 \
+        -traj $DD/rate_BAD_m{99..01}.txt $DD/rate_BAD_p{00..99}.txt \
+        -traj_q0         -0.{99..01}                 0.{00..99} \
+        -name trajectories_BAD
+    
+fi

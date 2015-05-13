@@ -264,15 +264,17 @@ fi
 
 
 # =============================================================================
-# HW 7
+# HW 8
 # =============================================================================
 
 if [ $1 == "HW8-SIM" ]; then
     cd langevin
-    # gcc langevin.cc -lstdc++ -o langevin
-    # ./langevin > $CHEM220_DATDIR/langevin.txt
-    gcc langevin.cc -DSPLITTING_RATE -lstdc++ -o langevin-split
+    # Basic langevin calculation
+    gcc langevin.cc -lstdc++ -o langevin
+    ./langevin > $CHEM220_DATDIR/langevin.txt
 
+    # Splitting rate calculations
+    gcc langevin.cc -DSPLITTING_RATE -lstdc++ -o langevin-split
     kT=1
     echo "Performing Noise-synchronized rate calculation"
     for q0 in {00..99}; do

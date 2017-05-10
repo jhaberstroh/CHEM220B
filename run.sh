@@ -334,3 +334,6 @@ if [ $1 == "HW8-DATA" ]; then
         -name trajectories_BAD
     
 fi
+
+echo "run.sh successfully reached the end with no errors."
+echo "If using HW#-SIM, check the status of background jobs with ps."

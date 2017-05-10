@@ -29,7 +29,6 @@ fi
 if [ $1 == "TEST-MC" ]; then
     cd hardsphere
     gcc hardsphere.cc -lstdc++ -o hardsphere-test -DVERBOSE -DXYZOUT -DACCEPTANCE
-    ./hardsphere-test -h
     ./hardsphere-test -nsteq 100 -nstmc 100 -step_size .7
 fi
 
@@ -339,5 +338,5 @@ if [ $1 == "HW8-DATA" ]; then
     
 fi
 
-echo "run.sh successfully reached the end with no errors."
-echo "If using HW#-SIM, check the status of background jobs with ps."
+echo "COMPLETE: run.sh successfully reached the end with no errors!"
+echo "COMPLETE: (If using HW#-SIM, check the status of background jobs with ps)"

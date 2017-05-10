@@ -6,14 +6,18 @@ set -o nounset
 if [ -z ${CHEM220_IMGDIR+x} ]; then
     CHEM220_IMGDIR=$(pwd)/images
 fi
+echo "CHEM220_IMGDIR=${CHEM220_IMGDIR}"
 if [ ! -e $CHEM220_IMGDIR ]; then
+    echo "Creating ${CHEM220_IMGDIR}..."
     mkdir $CHEM220_IMGDIR
 fi
 
 if [ -z ${CHEM220_DATDIR+x} ]; then
     CHEM220_DATDIR=$(pwd)/data
 fi
+echo "CHEM220_DATDIR=${CHEM220_DATDIR}"
 if [ ! -e $CHEM220_DATDIR ]; then
+    echo "Creating ${CHEM220_DATDIR}..."
     mkdir $CHEM220_DATDIR
 fi
 
